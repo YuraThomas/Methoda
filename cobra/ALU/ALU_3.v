@@ -9,8 +9,8 @@ module ALU_3 (
 parameter ADD = 4'd0;
 parameter SUB = 4'd1;
 parameter SLL = 4'd2;
-parameter SLTS = 4'3;
-parameter SLTU = 4'4;
+parameter SLTS = 4'd3;
+parameter SLTU = 4'd4;
 parameter XOR = 4'd5;
 parameter SRL = 4'd6;
 parameter SRA = 4'd7;
