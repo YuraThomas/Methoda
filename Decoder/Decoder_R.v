@@ -31,7 +31,7 @@ assign srcA = (opcode == opcode_R) ? 2'd0 :
 assign srcB = (opcode == opcode_R) ? 3'd0 :
 				  (opcode == opcode_I_1) ? 3'd1 : 
 				  (opcode == opcode_I_2) ? 3'd1 :
-				  (opcode == opcode_I_2) ? 3'd4 : ZAT[2:0];
+				  (opcode == opcode_I_3) ? 3'd4 : ZAT[2:0];
 
 assign memi = (opcode == opcode_R) ? 5'd0 :
 				  (opcode == opcode_I_1) ? 5'd0 :
