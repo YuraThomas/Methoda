@@ -21,7 +21,7 @@ parameter opcode_I_2 = 7'd3;
 parameter opcode_I_3 = 7'd103;
 
 wire [31:0] ZAT;	//Затычка в декодере
-assign ZAT = 32'd1;
+assign ZAT = 32'd0;
 
 assign srcA = (opcode == opcode_R) ? 2'd0 :
 				  (opcode == opcode_I_1) ? 2'd0 :
