@@ -26,7 +26,7 @@ parameter opcode_U_lui = 7'd55;
 parameter opcode_U_auipc = 7'd23;
 
 wire [31:0] ZAT;	//Затычка в декодере
-assign ZAT = 32'd1;
+assign ZAT = 32'd0;
 
 assign srcA = (opcode == opcode_R) ? 2'd0 :
 				  (opcode == opcode_I_1) ? 2'd0 :
