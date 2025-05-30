@@ -1,7 +1,13 @@
 module RISC_V(
 	input clk,
-	output out_proc
+	output [31:0] out_proc,
+	output ALU_C,
+	output [31:0] nomcom,
+	output [31:0] const_B
 );
+
+assign nomcom = PC;
+assign const_B = IMM_B;
 
 wire [31:0] PC;
 wire [31:0] out_com;
@@ -44,7 +50,7 @@ wire [31:0] IMM_B;
 assign IMM_I = {{20{out_com[31]}},out_com[31:20]};
 assign IMM_S = {{20{out_com[31]}},out_com[31:25],out_com[11:7]};
 assign IMM_J = {{12{out_com[31]}}, out_com[19:12], out_com[20], out_com [30:21],1'd0};
-assign IMM_B = {{20{out_com[31]}},out_com[30:25], out_com[11:8],out_com[7], 1'd0};
+assign IMM_B = {{20{out_com[31]}},out_com[7], out_com[30:25], out_com[11:8], 1'd0};
 
 assign func3 = out_com[14:12];
 assign opcode_dec = out_com[6:0];
@@ -61,10 +67,11 @@ assign ALU_B = (UPR_MUX_B == 3'd0) ? RF_data_B :
 					(UPR_MUX_B == 3'd1) ? IMM_I :
 					(UPR_MUX_B == 3'd2) ? {out_com[31:12],12'd0} :
 					(UPR_MUX_B == 3'd3) ? IMM_S :
-					(UPR_MUX_B == 3'd4) ? 32'd1 : 32'd0;
+					(UPR_MUX_B == 3'd4) ? 32'd4 : 32'd0;
 
 assign RF_data_in = (ws) ? out_mem : ALU_OUT;
-
+assign out_proc = RF_data_A;
+assign ALU_C = comp;
 Counter PeCount (
 	.clk(clk),
 	.comp(comp),
