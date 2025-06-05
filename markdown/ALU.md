@@ -332,13 +332,10 @@ $$Учтем\\данное\\условие\\выражением\\\overline{A\lb
 **Когда A \< 0 (знаковый бит = 1), B \< 0 (знаковый бит = 1), S \> 0 (знаковый бит = 0)**
 
 $$Учтем\\данное\\условие\\выражением\\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\\overline{S\lbrack 31\rbrack\rbrack}$$
-
-<p>В итоге, получим выражение для знакового сравнения:</p>
-<p><span class="math display">\[comp_{zn\ A &lt; B} = A\lbrack
-31\rbrack\&amp;\overline{B\lbrack 31\rbrack}\ \left| \
-\overline{A\lbrack 31\rbrack}\&amp;\overline{B\lbrack 31\rbrack}\&amp;
-S\lbrack 31\rbrack\  \right|\ A\lbrack 31\rbrack\&amp; B\lbrack
-31\rbrack\&amp; S\lbrack 31\rbrack\ \]</span></p>
+В итоге, получим выражение для знакового сравнения:
+\[
+\text{comp}_{zn\ A < B} = A[31] \& \overline{B[31]} \ \left| \ \overline{A[31]} \& \overline{B[31]} \& S[31] \ \right| \ A[31] \& B[31] \& \overline{S[31]}
+\]
 
 **Код на Verilog, описывающий компаратор знакового сравнения “меньше”.**
 
