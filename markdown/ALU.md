@@ -323,18 +323,26 @@
 
 **Когда A \< 0 (знаковый бит = 1), B \> 0 (знаковый бит = 0).**
 
-$$Учтем\\данное\\условие\\выражением\\A\lbrack 31\rbrack\\\overline{B\lbrack 31\rbrack}$$
+$$
+Учтем\\данное\\условие\\выражением\\A\lbrack 31\rbrack\\\overline{B\lbrack 31\rbrack}
+$$
 
 **Когда A \> 0 (знаковый бит = 0), B \> 0 (знаковый бит = 0), S \< 0 (знаковый бит = 1)**
 
-$$Учтем\\данное\\условие\\выражением\\\overline{A\lbrack 31\rbrack}\\\overline{B\lbrack 31\rbrack}\\ S\lbrack 31\rbrack$$
+$$
+Учтем\\данное\\условие\\выражением\\\overline{A\lbrack 31\rbrack}\\\overline{B\lbrack 31\rbrack}\\ S\lbrack 31\rbrack
+$$
 
 **Когда A \< 0 (знаковый бит = 1), B \< 0 (знаковый бит = 1), S \> 0 (знаковый бит = 0)**
 
-$$Учтем\\данное\\условие\\выражением\\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\\overline{S\lbrack 31\rbrack\rbrack}$$
+$$
+Учтем\\данное\\условие\\выражением\\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\\overline{S\lbrack 31\rbrack\rbrack}
+$$
 В итоге, получим выражение для знакового сравнения:
 
-$$comp\_{zn\\A \< B} = A\lbrack 31\rbrack\\\overline{B\lbrack 31\rbrack}\\\left| \\\overline{A\lbrack 31\rbrack}\\\overline{B\lbrack 31\rbrack}\\ S\lbrack 31\rbrack\\ \right|\\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\ S\lbrack 31\rbrack\\$$
+$$
+comp\_{zn\\A \< B} = A\lbrack 31\rbrack\\\overline{B\lbrack 31\rbrack}\\\left| \\\overline{A\lbrack 31\rbrack}\\\overline{B\lbrack 31\rbrack}\\ S\lbrack 31\rbrack\\ \right|\\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\ S\lbrack 31\rbrack\\
+$$
 
 
 **Код на Verilog, описывающий компаратор знакового сравнения “меньше”.**
