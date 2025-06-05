@@ -333,9 +333,12 @@ $$Учтем\\данное\\условие\\выражением\\\overline{A\lb
 
 $$Учтем\\данное\\условие\\выражением\\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\\overline{S\lbrack 31\rbrack\rbrack}$$
 
-В итоге, получим выражение для знакового сравнения:
-
-$$comp\_{zn\\A \< B} = A\lbrack 31\rbrack\\\overline{B\lbrack 31\rbrack}\\\left| \\\overline{A\lbrack 31\rbrack}\\\overline{B\lbrack 31\rbrack}\\ S\lbrack 31\rbrack\\ \right|\\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\ S\lbrack 31\rbrack\\$$
+<p>В итоге, получим выражение для знакового сравнения:</p>
+<p><span class="math display">\[comp_{zn\ A &lt; B} = A\lbrack
+31\rbrack\&amp;\overline{B\lbrack 31\rbrack}\ \left| \
+\overline{A\lbrack 31\rbrack}\&amp;\overline{B\lbrack 31\rbrack}\&amp;
+S\lbrack 31\rbrack\  \right|\ A\lbrack 31\rbrack\&amp; B\lbrack
+31\rbrack\&amp; S\lbrack 31\rbrack\ \]</span></p>
 
 **Код на Verilog, описывающий компаратор знакового сравнения “меньше”.**
 
