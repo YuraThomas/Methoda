@@ -335,9 +335,8 @@ $$
 
 **Когда A \< 0 (знаковый бит = 1), B \< 0 (знаковый бит = 1), S \> 0 (знаковый бит = 0)**
 
-$$
-Учтем\\данное\\условие\\выражением\\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\\overline{S\lbrack 31\rbrack\rbrack}
-$$
+
+Учтем данное условие выражением $$ \\A\lbrack 31\rbrack\\ B\lbrack 31\rbrack\\\overline{S\lbrack 31\rbrack\rbrack} $$
 В итоге, получим выражение для знакового сравнения:
 
 $$
