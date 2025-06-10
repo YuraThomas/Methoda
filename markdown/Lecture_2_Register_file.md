@@ -110,7 +110,24 @@ out = (data & Load) | (out & ~Load)
 
 **Код на Verilog**
 
-<img src="./media/image52.png" style="width:2.68823in;height:1.55128in" />
+``` Verilog
+module D_trig_s_en (
+	input data,
+	input Load,
+	input clk,
+	output reg out
+
+);
+
+wire data_en;
+assign data_en = data & Load | out & ~Load;
+
+always @(posedge clk) begin
+	out <= data_en;
+end
+
+endmodule
+```
 
 **Схема**
 
@@ -134,9 +151,39 @@ out = (data & Load) | (out & ~Load)
 
 **Код на Verilog**
 
-<img src="./media/image56.png" style="width:1.95833in;height:1.87984in" />
+``` Verilog
+module DX2(
+	input a_0,
+	input a_1,
+	output b_0,
+	output b_1,
+	output b_2,
+	output b_3
+);
 
-<img src="./media/image57.png" style="width:3.11926in;height:1.63333in" />
+assign b_0 = ~a_0&~a_1;
+assign b_1 = a_0&~a_1;
+assign b_2 = ~a_0&a_1;
+assign b_3 = a_0&a_1;
+
+endmodule
+```
+
+``` Verilog
+module DX_2_en (
+	input [1:0] a,
+	input enable,
+	output [3:0] b
+);
+
+assign b[0] = ~a[0] & ~a[1] & enable;
+assign b[1] = a[0] & ~a[1] & enable;
+assign b[2] = ~a[0] & a[1] & enable;
+assign b[3] = a[0] & a[1] & enable;
+
+endmodule
+```
+
 
 **Схема регистрового файла без WE**
 
