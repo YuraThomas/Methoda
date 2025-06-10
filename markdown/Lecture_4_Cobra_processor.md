@@ -79,12 +79,57 @@ WS – управление входом в регистровый файл (ч�
 Далее пойдет уже мой код на Verilog в котором я его описываю:
 
 **Мультиплексор на входе в регистровый файл:**
+``` Verilog
+module mux_RF (
+	input [1:0] upr_data,
+	input [31:0] SW,
+	input [31:0] work_const,
+	input [31:0] OUT_ALU,
+	output reg [31:0] data_RF
+);
+always @(*) begin
+	case (upr_data[1:0])
+		2'd0: data_RF = work_const;
+		2'd1: data_RF = SW;
+		2'd2: data_RF = OUT_ALU;
+		default: begin
+			data_RF = 0;
+		end
+	endcase;
+end
 
-<img src="./media/image85.png" style="width:2.13095in;height:1.97156in" />
+endmodule
+```
 
 **Регистровый файл:**
+``` Verilog
+module Register_file(
+	input [4:0] upr_A,
+	input [4:0] upr_B,
+	input [4:0] upr_in,
+	input [31:0] in,
+	output [31:0] A,
+	output [31:0] B,
+	input clk,
+	input WrEn
 
-<img src="./media/image86.png" style="width:3.43452in;height:2.78904in" />
+);
+
+reg  [31:0] RAM [0:31];
+
+assign A = (upr_A == 5'd0) ? 32'd0: RAM [upr_A];
+assign B = (upr_B == 5'd0) ? 32'd0: RAM [upr_B];
+
+always @(posedge clk) begin
+	if (WrEn) begin
+		RAM[upr_in] <= in;
+	end
+
+end
+
+
+endmodule 
+```
 
 **Модули АЛУ (кроме знакового компаратора, но он в конце статьи есть)**
 
