@@ -193,9 +193,144 @@ endmodule
 
 <img src="./media/image154.png" style="width:6.49306in;height:0.93056in" />
 
-**Декодер инструкций. Затычку надо поставить 32’d0 (иначе будет веселая константа)**
+**Декодер инструкций.**
+``` Verilog
+module Decoder_R (
+	input [6:0] opcode,
+	input [2:0] func3,
+	input [6:0] func7,
+	output jalr,
+	output enpc,
+	output jal,
+	output b,
+	output ws,
+	output [4:0] memi,
+	output mwe,
+	output rfwe,
+	output [4:0] aop,
+	output [2:0] srcB,
+	output [1:0] srcA
+);
 
-<img src="./media/image149.png" style="width:4.34722in;height:9.75043in" />
+parameter opcode_R = 7'd51;
+parameter opcode_I_1 = 7'd19;
+parameter opcode_I_2 = 7'd3;
+parameter opcode_I_3 = 7'd103;
+parameter opcode_S = 7'd35;
+parameter opcode_B= 7'd99;
+parameter opcode_J = 7'd111;
+parameter opcode_U_lui = 7'd55;
+parameter opcode_U_auipc = 7'd23;
+
+wire [31:0] ZAT;	//Затычка в декодере
+assign ZAT = 32'd0;
+
+assign srcA = (opcode == opcode_R) ? 2'd0 :
+				  (opcode == opcode_I_1) ? 2'd0 :
+				  (opcode == opcode_I_2) ? 2'd0 : 
+				  (opcode == opcode_I_3) ? 2'd1 :
+				  (opcode == opcode_S) ? 2'd3 :
+				  (opcode == opcode_B) ? 2'd0 :
+				  (opcode == opcode_J) ? 2'd1 :
+				  (opcode == opcode_U_lui) ? 2'd2 :
+				  (opcode == opcode_U_auipc) ? 2'd1 : ZAT[1:0];
+				  
+
+
+
+assign srcB = (opcode == opcode_R) ? 3'd0 :
+				  (opcode == opcode_I_1) ? 3'd1 : 
+				  (opcode == opcode_I_2) ? 3'd1 :
+				  (opcode == opcode_I_3) ? 3'd4 :
+				  (opcode == opcode_S) ? 3'd3 :
+				  (opcode == opcode_B) ? 3'd0 :
+				  (opcode == opcode_J) ? 3'd4 :
+				  ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 3'd2 : ZAT[2:0];
+
+assign memi = (opcode == opcode_R) ? 5'd0 :
+				  (opcode == opcode_I_1) ? 5'd0 :
+				  (opcode == opcode_I_2) ? {1'b1, 1'b0, func3} :
+				  (opcode == opcode_I_3) ? 5'd0 :
+				  (opcode == opcode_S) ? {1'b0, 1'b1, func3} : 
+				  (opcode == opcode_B) ? 5'd0 :
+				  (opcode == opcode_J) ? 5'd0 : 
+				  ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 5'd0 : ZAT[4:0];
+				  
+				  
+assign aop = (opcode == opcode_R) ? {func7[6:5], func3} :
+				 (opcode == opcode_I_1) ? {2'd0, func3} :
+				 (opcode == opcode_I_2) ? {2'd0, func3} :
+				 (opcode == opcode_I_3) ? 5'd0 :
+				 (opcode == opcode_S) ? 5'd0 :
+				 (opcode == opcode_B) ? {2'd3, func3} : 
+				 (opcode == opcode_J) ? 5'd0 :
+				 ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 5'd0 : ZAT[4:0];
+
+assign enpc = (opcode == opcode_R) ? 1'd1 :
+				  (opcode == opcode_I_1) ? 1'd1 :
+				  (opcode == opcode_I_2) ? 1'd1 :
+				  (opcode == opcode_I_3) ? 1'd1 :
+				  (opcode == opcode_S) ? 1'd1 :
+				  (opcode == opcode_B) ? 1'd1 :
+				  (opcode == opcode_J) ? 1'd1 :
+				  ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 1'd1 : ZAT[0];
+
+assign ws = (opcode == opcode_R) ? 1'd0 : 
+				(opcode == opcode_I_1) ? 1'd0 :
+				(opcode == opcode_I_2) ? 1'd1 :
+				(opcode == opcode_I_3) ? 1'd0 :
+				(opcode == opcode_S) ? 1'd1 : 
+				(opcode == opcode_B) ? 1'd0 : 
+				(opcode == opcode_J) ? 1'd0 :
+				((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 1'd0 : ZAT[0];
+
+assign mwe = (opcode == opcode_R) ? 1'd0 :
+				 (opcode == opcode_I_1) ? 1'd0 :
+				 (opcode == opcode_I_2) ? 1'd1 :
+				 (opcode == opcode_I_3) ? 1'd0 :
+				 (opcode == opcode_S) ? 1'd1 :
+				 (opcode == opcode_B) ? 1'd0 :
+				 (opcode == opcode_J) ? 1'd0 :
+				 ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 1'd0 : ZAT[0];
+
+assign rfwe = (opcode == opcode_R) ? 1'd1 :
+				  (opcode == opcode_I_1) ? 1'd1 :
+				  (opcode == opcode_I_2) ? 1'd1 :
+				  (opcode == opcode_I_3) ? 1'd1 :
+				  (opcode == opcode_S) ? 1'd0 :
+				  (opcode == opcode_B) ? 1'd0 :
+				  (opcode == opcode_J) ? 1'd1 : 
+				  ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 1'd1 : ZAT[0];
+
+assign jalr = (opcode == opcode_R) ? 1'd0 :
+				  (opcode == opcode_I_1) ? 1'd0 :
+				  (opcode == opcode_I_2) ? 1'd0 :
+				  (opcode == opcode_I_3) ? 1'd1 :
+				  (opcode == opcode_S) ? 1'd0 :
+				  (opcode == opcode_B) ? 1'd0 :
+				  (opcode == opcode_J) ? 1'd0 :
+				  ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 1'd0 : ZAT[0];
+
+
+assign jal = (opcode == opcode_R) ? 1'd0 :
+				 (opcode == opcode_I_1) ? 1'd0 :
+				 (opcode == opcode_I_2) ? 1'd0 :
+				 (opcode == opcode_I_3) ? 1'd0 :
+				 (opcode == opcode_S) ? 1'd0 :
+				 (opcode == opcode_B) ? 1'd0 :
+				 (opcode == opcode_J) ? 1'd1 :
+				 ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 1'd0 : ZAT[0];
+
+assign b = (opcode == opcode_R) ? 1'd0 :
+			  (opcode == opcode_I_1) ? 1'd0 :
+			  (opcode == opcode_I_2) ? 1'd0 :
+			  (opcode == opcode_I_3) ? 1'd0 :
+			  (opcode == opcode_S) ? 1'd0 :
+			  (opcode == opcode_B) ? 1'd1 : 
+			  (opcode == opcode_J) ? 1'd0 :
+			  ((opcode == opcode_U_lui) |(opcode == opcode_U_auipc))  ? 1'd0 : ZAT[0];
+endmodule
+```
 
 **Счетчик**
 
@@ -206,8 +341,43 @@ endmodule
 <img src="./media/image155.png" style="width:1.83333in;height:1.63352in" />
 
 **Описание на Verilog**
+``` Verilog
+module Counter (
+	input  clk,
+	input comp,
+	input PC_en,
+	input [31:0] RD1,
+	input [31:0] IMM_I,
+	input [31:0] IMM_J,
+	input [31:0] IMM_B,
+	input b,
+	input jal,
+	input jalr,
+	output reg [31:0] PC
+);
 
-<img src="./media/image156.png" style="width:3.59563in;height:3.57143in" />
+wire [31:0] PC_PLUS;
+wire b_comp;
+wire upr_mux_1;
+wire upr_mux_2;
+wire [31:0] out_mux_2;
+wire [31:0] PC_IN;
+assign b_comp = b & comp;
+assign upr_mux_1 = b_comp | jal;
+assign upr_mux_2 = b;
+assign PC_PLUS = (upr_mux_1 == 1'd0) ? 32'd4:out_mux_2;
+assign out_mux_2 = (upr_mux_2 == 1'd0) ? IMM_J : IMM_B;
+assign PC_IN = (jalr == 0) ? (PC+PC_PLUS) : (RD1+IMM_I);
+						
+
+
+always @(posedge clk) begin
+	if (PC_en == 1) PC <= PC_IN;
+	else PC <= PC;
+end
+
+endmodule
+```
 
 **Схема, которая синтезировалась**
 
@@ -230,6 +400,148 @@ endmodule
 Как читатель может видеть, простейший однотактный RISC-V весьма прост (да, тавтология) и занимает порядка 135(ядро)+100(АЛУ)+15(command_memory)+45(data memory)+135(декодер)+26(регистровый файл)+38(модули к АЛУ) = 464 строчек кода (порядка 500), что весьма подъемно для реализации за недельки так 2 с чашечкой чая (гикам можно меньше, разрешаю).**  
 **
 
-**Описание на Verilog RISC-V (код есть на гитхабе).**
+**Описание на Verilog RISC-V**
+``` Verilog
+module RISC_V(
+	input clk,
+	output [31:0] out_proc,
+	output ALU_C,
+	output [31:0] nomcom,
+	output [31:0] const_B
+);
 
-<img src="./media/image160.png" style="width:3.60826in;height:9.56944in" />
+assign nomcom = PC;
+assign const_B = IMM_B;
+
+wire [31:0] PC;
+wire [31:0] out_com;
+
+wire [31:0] ALU_A;
+wire [31:0] ALU_B;
+wire [31:0] ALU_OUT;
+wire [5:0] ALU_UPR;
+wire comp;
+
+wire WE_RF;
+wire [4:0] RF_A;
+wire [4:0] RF_B;
+wire [4:0] RF_in;
+wire [31:0] RF_data_A;
+wire [31:0] RF_data_B;
+wire [31:0] RF_data_in;
+wire [31:0] data_mem;
+
+wire [6:0] opcode_dec;
+wire [2:0] func3;
+wire [6:0] func7;
+wire b_dec;
+wire mem_WE_dec;
+wire [4:0] memi;
+wire jal;
+wire jalr;
+wire enpc;
+wire ws;
+wire  [31:0] out_mem;
+
+wire [1:0] UPR_MUX_A;
+wire [2:0] UPR_MUX_B;
+
+wire [31:0] IMM_I;
+wire [31:0] IMM_S;
+wire [31:0] IMM_J;
+wire [31:0] IMM_B;
+
+assign IMM_I = {{20{out_com[31]}},out_com[31:20]};
+assign IMM_S = {{20{out_com[31]}},out_com[31:25],out_com[11:7]};
+assign IMM_J = {{12{out_com[31]}}, out_com[19:12], out_com[20], out_com [30:21],1'd0};
+assign IMM_B = {{20{out_com[31]}},out_com[7], out_com[30:25], out_com[11:8], 1'd0};
+
+assign func3 = out_com[14:12];
+assign opcode_dec = out_com[6:0];
+assign func7 = out_com [31:25];
+assign RF_A = out_com[19:15] ;
+assign RF_B = out_com[24:20];
+assign RF_in = out_com [11:7];
+assign data_mem = RF_data_B;
+
+assign ALU_A = (UPR_MUX_A == 2'd0) ? RF_data_A :
+					(UPR_MUX_A == 2'd1) ? PC : 32'd0;
+
+assign ALU_B = (UPR_MUX_B == 3'd0) ? RF_data_B :
+					(UPR_MUX_B == 3'd1) ? IMM_I :
+					(UPR_MUX_B == 3'd2) ? {out_com[31:12],12'd0} :
+					(UPR_MUX_B == 3'd3) ? IMM_S :
+					(UPR_MUX_B == 3'd4) ? 32'd4 : 32'd0;
+
+assign RF_data_in = (ws) ? out_mem : ALU_OUT;
+assign out_proc = RF_data_A;
+assign ALU_C = comp;
+Counter PeCount (
+	.clk(clk),
+	.comp(comp),
+	.PC_en(enpc),
+	.RD1(RF_data_A),
+	.IMM_I(IMM_I),
+	.IMM_J(IMM_J),
+	.IMM_B(IMM_B),
+	.b(b_dec),
+	.jal(jal),
+	.jalr(jalr),
+	.PC(PC)
+);
+
+Decoder_R MAIN_DECODER (
+	.opcode(opcode_dec),
+	.func3(func3),
+	.func7(func7),
+	.jalr(jalr),
+	.enpc(enpc),
+	.jal(jal),
+	.b(b_dec),
+	.ws(ws),
+	.memi(memi),
+	.mwe(mem_WE_dec),
+	.rfwe(WE_RF),
+	.aop(ALU_UPR),
+	.srcB(UPR_MUX_B),
+	.srcA(UPR_MUX_A)
+);
+
+data_mem DATA_MEMORY(
+	.memi(memi),
+	.data(data_mem),
+	.upr_in(ALU_OUT), 
+	.out(out_mem),
+	.clk(clk),
+	.WrEn(mem_WE_dec)
+
+);
+
+
+ALU_3 ALU_RISCV(
+	.Upr_ALU(ALU_UPR),
+	.A(ALU_A),
+	.B(ALU_B),
+	.C(comp),
+	.Out_ALU(ALU_OUT)
+);
+
+Register_file RF(
+	.upr_A(RF_A),
+	.upr_B(RF_B),
+	.upr_in(RF_in),
+	.in(RF_data_in),
+	.A(RF_data_A),
+	.B(RF_data_B),
+	.clk(clk),
+	.WrEn(WE_RF)
+
+);
+command_memory CM (
+	.upr(PC),
+	.out(out_com)
+);
+
+
+endmodule
+```
