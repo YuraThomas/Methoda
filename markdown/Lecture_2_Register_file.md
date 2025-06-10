@@ -102,7 +102,7 @@ $$
 
 По смыслу, если Load = 1, то запись в триггер разрешена (out = data), если Load = 0, то запись в триггер запрещена (out = out). Тогда, мы можем записать логическое выражение для out через data и Load:
 
-$$out = data\\ Load\\|\\out\\\overline{Load}$$
+$$out = (data & Load) | (out & ~Load)$$
 
 Опишем данное устройство на Verilog:
 
@@ -113,9 +113,6 @@ $$out = data\\ Load\\|\\out\\\overline{Load}$$
 **Схема**
 
 <img src="./media/image53.png" style="width:5.16347in;height:1.29487in" />
-
-**  
-**
 
 **Буфер с 3 состояниями**
 
@@ -150,9 +147,6 @@ $$out = data\\ Load\\|\\out\\\overline{Load}$$
 **Код на Verilog.**
 
 <img src="./media/image60.png" style="width:2.25838in;height:9.23718in" />
-
-**  
-**
 
 **Схема регистрового файла с WE.**
 
