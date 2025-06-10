@@ -131,24 +131,246 @@ end
 endmodule 
 ```
 
-**Модули АЛУ (кроме знакового компаратора, но он в конце статьи есть)**
+**Модули АЛУ**
 
-<img src="./media/image28.png" style="width:1.69697in;height:1.13131in" />
+``` Verilog
+module and_32_b (
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] out_and
+);
+assign out_and = A & B;
 
-<img src="./media/image29.png" style="width:1.73485in;height:1.00197in" />
+endmodule
+```
 
-<img src="./media/image30.png" style="width:1.8447in;height:0.98485in" />
+``` Verilog
+module comp_menshe (
+	input [31:0] A,
+	input [31:0] B,
+	output out
+);
 
-**  
-**
+wire [31:0] S;
+assign S = A-B;
+assign out = (A[31] & ~B[31]) | (~A[31] & ~B[31] & S[31]) | (A[31] & B[31] & S[31]);
+
+endmodule
+```
+
+``` Verilog
+module or_32_b (
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] out_or
+
+);
+
+assign out_or = A | B;
+endmodule
+```
+
+``` Verilog
+module sl_mod2 (
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] out
+);
+
+assign out = A ^ B;
+
+endmodule
+```
 
 **АЛУ (заметьте, оно больше процессора)**
+```Verilog
+module ALU_3 (
+	input [3:0] Upr_ALU,
+	input [31:0] A,
+	input [31:0] B,
+	output C,
+	output [31:0] Out_ALU
+);
 
-<img src="./media/image87.png" style="width:3.13315in;height:9.30303in" />
+parameter ADD = 4'd0;
+parameter SUB = 4'd1;
+parameter SLL = 4'd2;
+parameter SLTS = 4'd3;
+parameter SLTU = 4'd4;
+parameter XOR = 4'd5;
+parameter SRL = 4'd6;
+parameter SRA = 4'd7;
+parameter OR = 4'd8;
+parameter AND = 4'd9;
+parameter EQ = 4'd10;
+parameter NE = 4'd11;
+parameter LTS = 4'd12;
+parameter GES = 4'd13;
+parameter LTU = 4'd14;
+parameter GEU = 4'd15;
+
+wire [31:0] out_or;
+wire [31:0] out_and;
+wire [31:0] out_add;
+wire [31:0] out_sub;
+wire [31:0] out_xor;
+wire [31:0] out_sll;
+wire [31:0] out_slts;
+wire [31:0] out_sltu;
+wire [31:0] out_srl;
+wire [31:0] out_sra;
+wire out_A_menshe_B_zn;
+wire out_A_ne_menshe_B_zn;
+wire out_A_menshe_B;
+wire out_A_ne_menshe_B;
+wire out_equal;
+wire out_notequal;
+
+assign out_A_ne_menshe_B_zn = ~out_A_menshe_B_zn;
+assign out_A_ne_menshe_B = ~out_A_menshe_B;
+assign out_equal = (A==B) ? 1'b1 : 1'b0;
+assign out_A_menshe_B = (A<B) ? 1'b1 : 1'b0;
+assign out_notequal = ~out_equal;
+
+assign out_add = A+B;
+assign out_sub = A-B;
+assign out_sll = A << B;
+assign out_slts = {{31{1'b0}},out_A_menshe_B_zn};
+assign out_sltu = {{31{1'b0}},out_A_menshe_B};
+assign out_srl = A >> B;
+assign out_sra = A >>>B;
+
+
+assign Out_ALU = (Upr_ALU == ADD) ? out_add:
+					  (Upr_ALU == SUB) ? out_sub:
+					  (Upr_ALU == SLL) ? out_sll:
+					  (Upr_ALU == SLTS) ? out_slts:
+					  (Upr_ALU == SLTU) ? out_sltu:
+					  (Upr_ALU == XOR) ? out_xor:
+					  (Upr_ALU == SRL) ? out_srl: 
+					  (Upr_ALU == SRA) ? out_sra:
+					  (Upr_ALU == OR) ? out_or:
+					  (Upr_ALU == AND) ? out_and:32'b0;
+
+assign C = (Upr_ALU == EQ) ? out_equal:
+			  (Upr_ALU == NE) ? out_notequal:
+			  (Upr_ALU == LTS) ? out_A_menshe_B_zn:
+			  (Upr_ALU == GES) ? out_A_ne_menshe_B_zn:
+			  (Upr_ALU == LTU) ? out_A_menshe_B:
+			  (Upr_ALU == GEU) ? out_A_ne_menshe_B:1'b0;
+					  
+									  
+or_32_b or_ALU (
+	.A(A),
+	.B(B),
+	.out_or(out_or)
+
+);
+
+and_32_b and_ALU (
+	.A(A),
+	.B(B),
+	.out_and(out_and)
+);
+
+sl_mod2 mod2_ALU (
+	.A(A),
+	.B(B),
+	.out(out_xor)
+);
+
+comp_menshe zn_comp (
+	.A(A),
+	.B(B),
+	.out(out_A_menshe_B_zn)
+);			
+endmodule
+```
 
 **Кобра, описание на Verilog:**
 
-<img src="./media/image88.png" style="width:3.85839in;height:9.62879in" />
+``` Verilog
+module cobra (
+	input clk,
+	input [31:0] SW,
+	output [31:0] HEX
+
+);
+
+wire [4:0] upr_in;
+wire [4:0] upr_1;
+wire [4:0] upr_2;
+wire [31:0] A;
+wire [31:0] B;
+wire WrEn;
+reg [31:0]data_RF;
+wire [31:0] pr_data_RF;
+wire [31:0] instr;
+wire [3:0] UPR_ALU;
+wire [31:0] OUT_ALU;
+reg [31:0] PC = 32'b0;
+wire c;
+wire [31:0] work_const;
+wire upr_mux2;
+wire [1:0] upr_data;
+
+
+assign upr_in = instr[12:8];
+assign upr_1 = instr[22:18];
+assign upr_2 = instr[17:13];
+assign UPR_ALU = instr[26:23];
+assign WrEn = instr[29];
+assign upr_mux2 = c&instr[30]|instr[31];
+assign work_const = {{24{instr[7]}}, instr[7:0] };
+assign upr_data = instr[28:27];
+assign pr_data_RF = data_RF;
+assign HEX = A;
+
+Register_file rfcbr (
+	.upr_A(upr_1),
+	.upr_B(upr_2),
+	.upr_in(upr_in),
+	.in(data_RF),
+	.A(A),
+	.B(B),
+	.clk(clk),
+	.WrEn(WrEn)
+); 
+
+always @(posedge clk) begin
+	if (upr_mux2==1) begin
+		PC <= PC + work_const;
+	end
+	
+	else  begin
+		PC <= PC + 1;
+	end
+end
+
+mux_RF mxcbr (
+	.upr_data(upr_data),
+	.SW(SW),
+	.work_const(work_const),
+	.OUT_ALU(OUT_ALU),
+	.data_RF(pr_data_RF)
+);
+
+ALU_3 alcbr (
+	.Upr_ALU(UPR_ALU),
+	.A(A),
+	.B(B),
+	.C(c),
+	.Out_ALU(OUT_ALU)
+);
+
+command_memory cmcbr (
+	.upr(PC),
+	.out(instr)
+);
+
+
+endmodule
+```
 
 **RTL схема Cobra:**
 
@@ -158,10 +380,3 @@ endmodule
 
 Мы теоретически разобрали простейший недопроцессор и даже описали его на Verilog и посмотрели, во что он синтезируется (а еще поняли, что процессор = очевидная штуковина). Да, для реального процессора это примерно скелет, нету даже элементарного декодера инструкций, но как ступенька для развития вполне себе подходит.
 
-**Дополнение: компаратор знакового сравнения “меньше” (к АЛУ).**
-
-<img src="./media/image39.png" style="width:6.62639in;height:1.50758in" />
-
-**RTL схема знакового компаратора “A меньше B”**
-
-<img src="./media/image40.png" style="width:6.35651in;height:1.75758in" />
