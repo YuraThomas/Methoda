@@ -271,11 +271,40 @@
 
 **Описание АЛУ на Verilog (модули).**
 
-<img src="./media/image28.png" style="width:2.54545in;height:1.69697in" />
+``` Verilog
+module and_32_b (
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] out_and
+);
+assign out_and = A & B;
 
-<img src="./media/image29.png" style="width:2.59715in;height:1.5in" />
+endmodule
+```
 
-<img src="./media/image30.png" style="width:2.92314in;height:1.56061in" />
+``` Verilog
+module or_32_b (
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] out_or
+
+);
+
+assign out_or = A | B;
+endmodule
+```
+
+``` Verilog
+module sl_mod2 (
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] out
+);
+
+assign out = A ^ B;
+
+endmodule
+```
 
 **Тест АЛУ.**
 
