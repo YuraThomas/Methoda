@@ -302,9 +302,6 @@ endmodule
 
 <img src="./media/image15.png" style="width:6.49444in;height:0.67778in" />
 
-**  
-**
-
 **Тест операции 1 (выдает A + B)**
 
 <img src="./media/image16.png" style="width:6.48889in;height:0.68889in" />
