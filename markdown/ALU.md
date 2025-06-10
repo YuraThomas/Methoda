@@ -83,11 +83,59 @@
 
 **Описание на Verilog с красивой RTL схемой (загнал операции ИЛИ, И в модули).**
 
-<img src="./media/image4.png" style="width:3.11975in;height:2.48611in" />
+``` Verilog
+module ALU_1 (
+	input [1:0] Upr_ALU,
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] Out_ALU
+);
 
-<img src="./media/image5.png" style="width:2.93926in;height:1.54167in" />
+wire [31:0] or_mux;
+wire [31:0] and_mux;
 
-<img src="./media/image6.png" style="width:2.94444in;height:1.47222in" />
+assign Out_ALU = (Upr_ALU == 2'd0) ? 32'b0:
+					  (Upr_ALU == 2'd1) ? 32'b1:
+					  (Upr_ALU == 2'd2) ? or_mux: and_mux;
+					  
+or_32_b or_ALU (
+	.A(A),
+	.B(B),
+	.out_or(or_mux)
+
+);
+
+and_32_b and_ALU (
+	.A(A),
+	.B(B),
+	.out_and(and_mux)
+);
+						
+endmodule
+```
+
+``` Verilog
+module and_32_b (
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] out_and
+);
+assign out_and = A & B;
+
+endmodule
+```
+
+``` Verilog
+module or_32_b (
+	input [31:0] A,
+	input [31:0] B,
+	output [31:0] out_or
+
+);
+
+assign out_or = A | B;
+endmodule
+```
 
 **Тестирование первого АЛУ**
 
