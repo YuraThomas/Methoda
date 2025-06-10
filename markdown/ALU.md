@@ -353,7 +353,6 @@ assign out = (A[31] & ~B[31]) | (~A[31] & ~B[31] & S[31]) | (A[31] & B[31] & S[3
 endmodule
 
 ```
-<img src="./media/image39.png" style="width:6.62639in;height:1.50758in" />
 
 **RTL схема знакового компаратора “A меньше B”**
 
