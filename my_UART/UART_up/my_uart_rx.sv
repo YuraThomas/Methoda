@@ -9,24 +9,21 @@ module my_uart_rx
     output [7:0] data_o
 );
 
-reg control_start_rx;
+logic control_start_rx;
 localparam NUM_BIT_COUNT = $clog2 (NUM_CLK);
 localparam HALF_BIT_COUNT = NUM_BIT_COUNT/2; 
-reg [NUM_BIT_COUNT - 1 : 0] cnt_baud;
-reg [8:0] data = 9'd0;   
-wire baud;
+logic [NUM_BIT_COUNT - 1 : 0] cnt_baud;
+logic [8:0] data;   
+logic baud;
 assign baud = (cnt_baud == NUM_CLK-1);
 
 always @(posedge clk_i) begin
 	if (rst_i) cnt_baud <= {NUM_BIT_COUNT{1'd0}};
 	else begin
-		if (baud) cnt_baud <= {NUM_BIT_COUNT{1'd0}};
-		else cnt_baud <= cnt_baud + 1;
-		
-		case (state)
+	  case (state)
 			INITIAL_STATE_FSM : begin
-			cnt_baud <= {NUM_BIT_COUNT{1'd0}};
-			control_start_rx <= 1'd1;
+				cnt_baud <= {NUM_BIT_COUNT{1'd0}};
+				control_start_rx <= 1'd1;
 			end
 			
 			CONTROL_INPUT_STATE_FSM : begin
@@ -35,6 +32,10 @@ always @(posedge clk_i) begin
 					cnt_baud <= {NUM_BIT_COUNT{1'd0}};
 				end
 		
+				else cnt_baud <= cnt_baud + 1;
+				
+			RECIEVE_DATA_FSM : 
+				if (baud) cnt_baud <= {NUM_BIT_COUNT{1'd0}};
 				else cnt_baud <= cnt_baud + 1;
 			end
 		endcase
@@ -49,7 +50,7 @@ typedef enum {
     RECIEVE_DATA_FSM} state_FSM;
 
 
-always @(*) begin
+always_comb begin
 	next_state = state;
 	case (state)
 		CONTROL_INPUT_STATE_FSM : begin
