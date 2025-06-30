@@ -1,0 +1,102 @@
+module piplened_sqrt (
+    input logic [31:0] data_i,
+    input arg_vld_i,
+    input clk_i,
+    input rst_i,
+    output logic [31:0] res_o,
+    output logic res_vld_o
+);
+
+logic [31:0] memory;
+assign res_o = memory;
+assign res_vld_o = (count_pip == 2'd3);
+
+logic do_1;
+logic [31:0] input_data_sqrt_1;
+logic done_1;
+logic [15:0] output_data_sqrt_1;
+logic [1:0] count;
+logic [1:0] count_pip;
+
+typedef enum { 
+    CALK_SQRT_FSM,
+    NO_CALK_FSM
+} state_fsm_type;
+
+state_fsm_type state = NO_CALK_FSM;
+state_fsm_type next_state;
+
+always @(*) begin
+    next_state = state;
+    case(state)
+        NO_CALK_FSM: if (arg_vld_i) next_state = CALK_SQRT_FSM;
+        CALK_SQRT_FSM: if (rst_i || count_pip == 2'd3) next_state = NO_CALK_FSM;
+    endcase
+end
+
+always @(*) begin
+    do_1 = 1'b0;
+    input_data_sqrt_1 = 32'd0;
+    
+    case(state)
+        NO_CALK_FSM: begin
+            if (arg_vld_i) begin 
+                do_1 = 1'b1;
+                input_data_sqrt_1 = data_i;
+            end
+				
+        end
+        
+        CALK_SQRT_FSM: begin
+            if(count < 2'd2) begin
+                do_1 = 1'b1;
+                input_data_sqrt_1 = data_i;
+            end
+        end
+    endcase
+end
+
+
+always @(posedge clk_i) begin
+    if(rst_i) begin
+        memory <= 32'd0;
+        count <= 2'd0;
+        count_pip <= 2'd0;
+    end
+	 
+	 else begin
+   
+        if (state == CALK_SQRT_FSM && do_1) begin
+            count <= count + 2'd1;
+        end
+        
+        if (done_1) begin
+            memory <= memory + output_data_sqrt_1;
+        end
+        
+        if (done_1 && count_pip < 2'd3) begin
+            count_pip <= count_pip + 2'd1;
+        end
+        
+        if(next_state == NO_CALK_FSM) begin
+            count <= 2'd0;
+            count_pip <= 2'd0;
+        end
+    end
+end
+
+always @(posedge clk_i) begin
+	if(rst_i) state <= NO_CALK_FSM;
+	else state <= next_state;
+end
+
+isqrt SQRT_1 (
+    .x_vld (do_1),
+    .x (input_data_sqrt_1),
+    .y_vld (done_1),
+    .y (output_data_sqrt_1),
+    .clk (clk_i),
+    .rst (rst_i)
+);
+
+endmodule
