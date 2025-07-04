@@ -1,12 +1,12 @@
 module my_fifo
-#(parameter width = 2, depth = 4)
+#(parameter width = 2, depth = 40)
 (
     input                clk,
     input                rst,
     input                push,
     input                pop,
     input  [width - 1:0] write_data,
-    output [width - 1:0] read_data,
+    output logic [width - 1:0] read_data,
     output               empty,
     output               full
 );
@@ -19,37 +19,45 @@ logic [pointer_depth +1 : 0] count_in_fifo;
 logic [pointer_depth +1 : 0] count_out_fifo;
 
 reg [pointer_depth : 0] chislo;
-wire [width-1 : 0] fifo [depth -1 : 0];
+logic [width-1 : 0] fifo [depth -1 : 0];
 
-wire uslovie_schitivanie = pop & (chislo > 0);
+wire uslovie_schitivanie = pop && (chislo > 0);
 
 always @(posedge clk) begin
 	if (rst) begin
 		count_in_fifo <= '0;
-		read_data <= '0;
 		count_out_fifo <= '0;
 		chislo = '0;
 	end
 	else begin
-		if (push) begin 
+		if (push && ~pop) begin 
 			fifo [count_in_fifo] <= write_data;
-			chislo <= chislo +'1;
+			chislo <= chislo +1;
 			
 			if (count_in_fifo == (depth_minus_1)) count_in_fifo <= '0;
-			else count_in_fifo <= count_in_fifo +'1;
+			else count_in_fifo <= count_in_fifo +1;
 		end
 	
-		if (uslovie_schitivanie) begin 
-			read_data <= fifo [count_out_fifo];
-			chislo <= chislo - '1;
-			if (count_out_fifo == (depth_minus_1)) count_out_fifo <= '0;
-			else count_out_fifo <= count_out_fifo +'1;
+		if (uslovie_schitivanie && ~(push&&pop)) begin 
+			chislo <= chislo - 1;
+            if (count_out_fifo == (depth_minus_1)) count_out_fifo <= '0;
+            else count_out_fifo <= count_out_fifo +1;
 		end
+        
+        if (push && pop) begin
+            fifo [count_in_fifo] <= write_data;
+            if (count_out_fifo == (depth_minus_1)) count_out_fifo <= '0;
+            else count_out_fifo <= count_out_fifo +1;
+            if (count_in_fifo == (depth_minus_1)) count_in_fifo <= '0;
+			else count_in_fifo <= count_in_fifo +1;
+        end
+        
+        
 			
 	end
 end
 
-
+assign read_data = fifo [count_out_fifo];
 assign empty = (chislo == '0);
-assign full = (chislo == (depth -'1));
+assign full = (chislo == (depth));
 endmodule
