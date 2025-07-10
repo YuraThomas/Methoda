@@ -416,7 +416,7 @@ assign srcA = (opcode == opcode_R) ? 2'd0 :
 				  (opcode == opcode_I_1) ? 2'd0 :
 				  (opcode == opcode_I_2) ? 2'd0 : 
 				  (opcode == opcode_I_3) ? 2'd1 :
-				  (opcode == opcode_S) ? 2'd3 :
+				  (opcode == opcode_S) ? 2'd0 :
 				  (opcode == opcode_B) ? 2'd0 :
 				  (opcode == opcode_J) ? 2'd1 :
 				  (opcode == opcode_U_lui) ? 2'd2 :
