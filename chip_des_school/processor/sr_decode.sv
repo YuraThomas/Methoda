@@ -10,7 +10,7 @@
 //  for systemverilog-homework project.
 //
 
-`include "sr_cpu.svh"
+`include "sr_cpu.sv"
 
 module sr_decode
 (
@@ -23,7 +23,8 @@ module sr_decode
     output       [ 6:0] cmdF7,
     output logic [31:0] immI,
     output logic [31:0] immB,
-    output logic [31:0] immU
+    output logic [31:0] immU,
+	 output [31:0] IMM_J
 );
     assign cmdOp = instr [ 6: 0];
     assign rd    = instr [11: 7];
@@ -31,6 +32,8 @@ module sr_decode
     assign rs1   = instr [19:15];
     assign rs2   = instr [24:20];
     assign cmdF7 = instr [31:25];
+	 wire [31:0]  out_com;
+	 assign out_com = instr;
 
     // I-type
 
@@ -58,5 +61,6 @@ module sr_decode
         immU [11: 0] = 12'b0;
         immU [31:12] = instr [31:12];
     end
-
+	
+	assign IMM_J = {{12{out_com[31]}}, out_com[19:12], out_com[20], out_com [30:21],1'd0};
 endmodule

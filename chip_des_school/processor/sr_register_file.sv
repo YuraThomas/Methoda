@@ -10,7 +10,7 @@
 //  for systemverilog-homework project.
 //
 
-`include "sr_cpu.svh"
+`include "sr_cpu.sv"
 
 module sr_register_file
 (
