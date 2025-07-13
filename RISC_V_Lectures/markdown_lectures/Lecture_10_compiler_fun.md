@@ -556,10 +556,9 @@ linkable file". Executable -- значит исполняемый, его мож
 прошивку. Эльфа при желании можно конвертировать в bin или hex.
 
 Команда:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=rv32i_zicsr -mabi=ilp32
-main.cpp -o main.elf
-
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=rv32i_zicsr -mabi=ilp32 main.cpp -o main.elf
+```
 Результат:
 
 ![](media/image1.png){width="6.496527777777778in"
@@ -582,11 +581,10 @@ height="5.403383639545057in"}
 
 Команда:
 
-\`\`\`bash
+```bash
 
 \$ /c/riscv_cc/bin/riscv-none-elf-readelf -S main.elf
-
-\`\`\`
+```
 
 Результат:
 
@@ -608,11 +606,11 @@ height="4.584354768153981in"}
 
 Пример команды (лучше перенаправить вывод в файл, т.к. много букв):
 
-\`\`\`bash
+```bash
 
 \$ /c/riscv_cc/bin/riscv-none-elf-objdump -d main.elf \> main_disasm.s
 
-\`\`\`
+```
 
 Вырезка результата с, содержащая main и функцию умножения:
 
@@ -623,21 +621,18 @@ height="3.357435476815398in"}
 программы. Однако, вместо эльфа можно сделать О. О -- объектный файл.
 Команда:
 
-\`\`\`bash
+```bash
 
-\$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=\"rv32i_zicsr\" -c main.cpp
--o objtest.o
-
-\`\`\`
+\$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=\"rv32i_zicsr\" -c main.cpp -o objtest.o
+```
 
 Даже в блокноте результат значительно компактнее, хотя всё равно не
 читается. Сделаем, как раньше, дизассемблирование. Команда:
 
-\`\`\`bash
+```bash
 
 \$ /c/riscv_cc/bin/riscv-none-elf-objdump -d objtest.o \> disobjtest.s
-
-\`\`\`
+```
 
 Результат:
 
@@ -651,11 +646,11 @@ height="3.605893482064742in"}
 
 Команда:
 
-\`\`\`bash
+```bash
 
 \$ /c/riscv_cc/bin/riscv-none-elf-objdump -s objtest.o \> disobjtestp.s
 
-\`\`\`
+```
 
 Результат:
 
@@ -675,9 +670,9 @@ objcopy. Она также позволяет редактировать бин�
 удалять ненужное.
 
 Команда:
-
+```bash
 \$ /c/riscv_cc/bin/riscv-none-elf-objcopy -O verilog main.elf init.mem
-
+```
 Результат:
 
 ![](media/image11.png){width="4.604166666666667in"
@@ -687,12 +682,10 @@ height="4.645833333333333in"}
 readmem, однако по умолчанию данные записаны побайтово. Исправляется это
 той же командой с дополнительной опцией:
 
-\`\`\`bash
+```bash
 
-\$ /c/riscv_cc/bin/riscv-none-elf-objcopy -O verilog
-\--verilog-data-width=4 main.elf meme.AHAHAHAHAH
-
-\`\`\`
+\$ /c/riscv_cc/bin/riscv-none-elf-objcopy -O verilog\--verilog-data-width=4 main.elf meme.AHAHAHAHAH
+```
 
 Результат представлен в виде байтов, сгруппированных по 4. Но ещё
 произошёл разворот всех полученных строк! Дело в том, что в Verilog
@@ -732,30 +725,22 @@ little-endian, поэтому младший байт идёт в конец с�
 
 Сначала **напишем линкер.** Структура его такая:
 
-\`\`\`cpp
+```cpp
+OUTPUT_FORMAT("elf32-littleriscv")
 
-OUTPUT_FORMAT(\"elf32-littleriscv\")
-
-ENTRY(\_start) //тут пишем штуку, после которой будет первая исполняемая
-команда
+ENTRY(_start) //тут пишем штуку, после которой будет первая исполняемая команда
 
 MEMORY
-
 {
-
-//тут рассказываем про физическое устройство памяти
-
+  //тут рассказываем про физическое устройство памяти
 }
 
 SECTIONS
-
 {
-
-//тут про расположение секций кода в памяти (по адресам)
-
+  //тут про расположение секций кода в памяти (по адресам)
 }
+```
 
-\`\`\`
 
 Стандартное расширение -- ".ld". Ссылка на документацию (не официальный
 сайт, но текст тот же самый, а навигация может быть удобнее):
@@ -772,18 +757,16 @@ https://home.cs.colorado.edu/\~main/cs1300/doc/gnu/ld_3.html#IDX338
 избегаться. Можно писать только одну команду MEMORY. Формат описания
 памяти:
 
-\`\`\`
+```txt
 
-имя (необязательные сведения о доступе) : ORIGIN = адрес начала, LENGTH
-= длина в битах
-
-\`\`\`
+имя (необязательные сведения о доступе) : ORIGIN = адрес начала, LENGTH = длина в битах
+```
 
 Памяти у нас две, их описание будет выглядеть примерно так:
-
+```txt
 command_meme (rx) : ORIGIN = 0x00000000, LENGTH = 128
-
 data_meme (!rx) : ORIGIN = 0x00000000, LENGTH = 256
+```
 
 X -- значит исполняемая секция, то есть, команды. R -- read only. Память
 данных этими свойствами не обладает, поэтому можно написать отрицание
