@@ -782,20 +782,15 @@ X -- значит исполняемая секция, то есть, коман
 Суть синтаксиса SECTIONS такая: компилятор по правилам, записанным в
 линкере, преобразует несколько объектных файлов в один исполняемый
 (компонует, собирает). Поэтому мы должны перечислить выходные секции:
-
+```cpp
 SECTIONS
-
 {
-
-.starter
-
-.text
-
-.data
-
-.bss
-
+  .starter
+  .text
+  .data
+  .bss
 }
+```
 
 Секцию starter мы создадим сами, когда будем писать стартер.
 Общепринятое название -- стартап-файл; отдельной строчкой в линкере
@@ -810,38 +805,27 @@ SECTIONS
 из объектных файлов и просто записывать их в фигурных скобках. Искать их
 будем, задавая шаблон. Как обычно, "\*" - любая последовательность, "?"
 -- один символ.
-
+```cpp
 SECTIONS
-
 {
+  .starter : {
+  *(.starter)
+  }
 
-.starter : {
+  .text : {
+  *(.text)
+  }
 
-\*(.starter)
+  .data : {
+  *(.*data*)
+  }
 
+  .bss : {
+  *(.sbss*)
+  *(.bss*)
+  }
 }
-
-.text : {
-
-\*(.text)
-
-}
-
-.data : {
-
-\*(.\*data\*)
-
-}
-
-.bss : {
-
-\*(.sbss\*)
-
-\*(.bss\*)
-
-}
-
-}
+```
 
 Запись \*(шаблон) означает, что будут размещены все секции, названия
 которых подходят по шаблону.
@@ -870,68 +854,49 @@ ASSERT(контролируемое условие, "сообщение при �
 
 Итоговый скрипт:
 
-\`\`\`ld
+```ld
+OUTPUT_FORMAT("elf32-littleriscv")
 
-OUTPUT_FORMAT(\"elf32-littleriscv\")
-
-ENTRY(\_POYEHALI) //тут пишем штуку, после которой будет первая
-исполняемая команда
+ENTRY(_POYEHALI) //тут пишем штуку, после которой будет первая исполняемая команда
 
 MEMORY
-
 {
-
-command_meme (rx) : ORIGIN = 0x00000000, LENGTH = 128
-
-data_meme (!rx) : ORIGIN = 0x00000000, LENGTH = 256
-
+  command_meme (rx) : ORIGIN = 0x00000000, LENGTH = 128
+  data_meme (!rx) : ORIGIN = 0x00000000, LENGTH = 256
 }
 
 SECTIONS
-
 {
+  .starter : {
+  *(.starter)
+  } > command_meme
 
-.starter : {
+  .text : {
+  *(.text)
+  } > command_meme
 
-\*(.starter)
+  .data : AT (0x000FEFAF) {
+  _globl_ptr = . + 128;
+  *(.*data*)
+  } > data_meme
 
-} \> command_meme
+  . = ALIGN(4);
 
-.text : {
+  _bss_start = .;
 
-\*(.text)
+  .bss : {
+  *(.*bss*)
+  } > data_meme
 
-} \> command_meme
+  _bss_end = .;
 
-.data : AT (0x000FEFAF) {
+  . = LENGTH(data_meme);
+  _stack_ptr = ALIGN(16);
 
-\_globl_ptr = . + 128;
-
-\*(.\*data\*)
-
-} \> data_meme
-
-. = ALIGN(4);
-
-\_bss_start = .;
-
-.bss : {
-
-\*(.\*bss\*)
-
-} \> data_meme
-
-\_bss_end = .;
-
-. = LENGTH(data_meme);
-
-\_stack_ptr = ALIGN(16);
-
-ASSERT(\_stack_ptr \<= LENGTH(data_meme));
-
+  ASSERT(_stack_ptr <= LENGTH(data_meme));
 }
+```
 
-\`\`\`
 
 Для более полного ознакомления с возможностями ld линкеров,
 используемыми в более сложных системах, чем наша, рекомендуется
@@ -944,50 +909,38 @@ ASSERT(\_stack_ptr \<= LENGTH(data_meme));
 оставим нулями. После main добавим бесконечный цикл.
 
 Итоговый стартап-файл:
+```asm
+  .section .starter
+  .global _poyehaliy
+_poyehaliy:
+  la    gp, _globl_ptr
+  la    sp, _stack_ptr
 
-.section .starter
+  la    t0, _bss_start
+  la    t1, _bss_end
 
-.global \_poyehaliy
+_bss_init_loop:
+  blt   t1, t0, 
+  sw    zero, 0(t0)
+  addi  t0, t0, 4
+  j     _bss_init_loop
 
-\_poyehaliy:
+_main_call:
+  li    a0, 0
+  li    a1, 0
 
-la gp, \_globl_ptr
+  call  main
 
-la sp, \_stack_ptr
-
-la t0, \_bss_start
-
-la t1, \_bss_end
-
-\_bss_init_loop:
-
-blt t1, t0,
-
-sw zero, 0(t0)
-
-addi t0, t0, 4
-
-j \_bss_init_loop
-
-\_main_call:
-
-li a0, 0
-
-li a1, 0
-
-call main
-
-\_endless_loop:
-
-j \_endless_loop
-
+_endless_loop:
+  j     _endless_loop
+```
 Далее мы будем писать много команд, и хотелось бы, чтобы их синтаксис не
 вызывал лишних вопросов.
 
 Типовая команда для сборки:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
-файл.расширение -o файл.o
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c файл.расширение -o файл.o
+```
 
 Вызываем в нужной папке компилятор, -march указывает архитектуру rv32i,
 mabi устанавливает размер переменных (int, long, pointer по 32 бита), -c
@@ -998,10 +951,9 @@ mabi устанавливает размер переменных (int, long, po
 
 Линкер собирать не нужно, это скрипт для компилятора. Линковка делается
 командой:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32
--nostartfiles -T linker.ld файл1.o файл2.o -o эльф.elf
-
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostartfiles -T linker.ld файл1.o файл2.o -o эльф.elf
+```
 Здесь есть несколько полезных опций. nostartfiles говорит не
 использовать стандартный стартап-файл (у нас он не поместится в память).
 Можно также указать --nostdlib, чтобы стандартная библиотека не
@@ -1023,366 +975,237 @@ objcopy.
 ![](media/image13.png){width="6.49375in" height="0.8048611111111111in"}
 
 Смотрим дизасм:
+```asm
+00000000 <_bss_end>:
+   0:	08000193          	li	gp,128
+   4:	00019117          	auipc	sp,0x19
+   8:	ffc10113          	add	sp,sp,-4 # 19000 <_stack_ptr>
+   c:	00000293          	li	t0,0
+  10:	00000313          	li	t1,0
 
-00000000 \<\_bss_end\>:
+00000014 <_bss_init_loop>:
+  14:	00534863          	blt	t1,t0,24 <_main_call>
+  18:	0002a023          	sw	zero,0(t0)
+  1c:	00428293          	add	t0,t0,4
+  20:	ff5ff06f          	j	14 <_bss_init_loop>
 
-0: 08000193 li gp,128
+00000024 <_main_call>:
+  24:	00000513          	li	a0,0
+  28:	00000593          	li	a1,0
+  2c:	008000ef          	jal	34 <main>
 
-4: 00019117 auipc sp,0x19
+00000030 <_endless_loop>:
+  30:	0000006f          	j	30 <_endless_loop>
 
-8: ffc10113 add sp,sp,-4 \# 19000 \<\_stack_ptr\>
+00000034 <main>:
+  34:	fe010113          	add	sp,sp,-32
+  38:	00112e23          	sw	ra,28(sp)
+  3c:	00812c23          	sw	s0,24(sp)
+  40:	02010413          	add	s0,sp,32
+  44:	ff100793          	li	a5,-15
+  48:	fef42623          	sw	a5,-20(s0)
+  4c:	00300793          	li	a5,3
+  50:	fef42423          	sw	a5,-24(s0)
+  54:	fe842583          	lw	a1,-24(s0)
+  58:	fec42503          	lw	a0,-20(s0)
+  5c:	01c000ef          	jal	78 <__mulsi3>
+  60:	00050793          	mv	a5,a0
+  64:	00078513          	mv	a0,a5
+  68:	01c12083          	lw	ra,28(sp)
+  6c:	01812403          	lw	s0,24(sp)
+  70:	02010113          	add	sp,sp,32
+  74:	00008067          	ret
 
-c: 00000293 li t0,0
+00000078 <__mulsi3>:
+  78:	00050613          	mv	a2,a0
+  7c:	00000513          	li	a0,0
 
-10: 00000313 li t1,0
-
-00000014 \<\_bss_init_loop\>:
-
-14: 00534863 blt t1,t0,24 \<\_main_call\>
-
-18: 0002a023 sw zero,0(t0)
-
-1c: 00428293 add t0,t0,4
-
-20: ff5ff06f j 14 \<\_bss_init_loop\>
-
-00000024 \<\_main_call\>:
-
-24: 00000513 li a0,0
-
-28: 00000593 li a1,0
-
-2c: 008000ef jal 34 \<main\>
-
-00000030 \<\_endless_loop\>:
-
-30: 0000006f j 30 \<\_endless_loop\>
-
-00000034 \<main\>:
-
-34: fe010113 add sp,sp,-32
-
-38: 00112e23 sw ra,28(sp)
-
-3c: 00812c23 sw s0,24(sp)
-
-40: 02010413 add s0,sp,32
-
-44: ff100793 li a5,-15
-
-48: fef42623 sw a5,-20(s0)
-
-4c: 00300793 li a5,3
-
-50: fef42423 sw a5,-24(s0)
-
-54: fe842583 lw a1,-24(s0)
-
-58: fec42503 lw a0,-20(s0)
-
-5c: 01c000ef jal 78 \<\_\_mulsi3\>
-
-60: 00050793 mv a5,a0
-
-64: 00078513 mv a0,a5
-
-68: 01c12083 lw ra,28(sp)
-
-6c: 01812403 lw s0,24(sp)
-
-70: 02010113 add sp,sp,32
-
-74: 00008067 ret
-
-00000078 \<\_\_mulsi3\>:
-
-78: 00050613 mv a2,a0
-
-7c: 00000513 li a0,0
-
-00000080 \<\_globl_ptr\>:
-
-80: 0015f693 and a3,a1,1
-
-84: 00068463 beqz a3,8c \<\_globl_ptr+0xc\>
-
-88: 00c50533 add a0,a0,a2
-
-8c: 0015d593 srl a1,a1,0x1
-
-90: 00161613 sll a2,a2,0x1
-
-94: fe0596e3 bnez a1,80 \<\_globl_ptr\>
-
-98: 00008067 ret
+00000080 <_globl_ptr>:
+  80:	0015f693          	and	a3,a1,1
+  84:	00068463          	beqz	a3,8c <_globl_ptr+0xc>
+  88:	00c50533          	add	a0,a0,a2
+  8c:	0015d593          	srl	a1,a1,0x1
+  90:	00161613          	sll	a2,a2,0x1
+  94:	fe0596e3          	bnez	a1,80 <_globl_ptr>
+  98:	00008067          	ret
 
 Disassembly of section .comment:
+```
 
 Итак, мы пишем все переменные в стек. Похоже, переменные локальные и
 инициализируются сразу, поэтому не попадают в data и bss. Создадим
 глобальную переменную.
 
 Программа:
-
+```cpp
 int x;
-
 int main ()
-
 {
-
-x = 15;
-
-return x\*x;
-
+	x = 15;
+	return x*x;
 }
-
+```
 Команда для сборки:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c test.c
--o test.o
-
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c test.c -o test.o
+```
 Команда для дизассемблирования:
-
+```bash
 \$ /c/riscv_cc/bin/riscv-none-elf-objdump -D test.o \> t1.S
-
+```
 Результат:
-
+```asm
 Disassembly of section .text:
 
-00000000 \<main\>:
-
-0: ff010113 add sp,sp,-16
-
-4: 00112623 sw ra,12(sp)
-
-8: 00812423 sw s0,8(sp)
-
-c: 01010413 add s0,sp,16
-
-10: 000007b7 lui a5,0x0
-
-14: 00f00713 li a4,15
-
-18: 00e7a023 sw a4,0(a5) \# 0 \<main\>
-
-1c: 000007b7 lui a5,0x0
-
-20: 0007a703 lw a4,0(a5) \# 0 \<main\>
-
-24: 000007b7 lui a5,0x0
-
-28: 0007a783 lw a5,0(a5) \# 0 \<main\>
-
-2c: 00078593 mv a1,a5
-
-30: 00070513 mv a0,a4
-
-34: 00000097 auipc ra,0x0
-
-38: 000080e7 jalr ra \# 34 \<main+0x34\>
-
-3c: 00050793 mv a5,a0
-
-40: 00078513 mv a0,a5
-
-44: 00c12083 lw ra,12(sp)
-
-48: 00812403 lw s0,8(sp)
-
-4c: 01010113 add sp,sp,16
-
-50: 00008067 ret
-
+00000000 <main>:
+   0:	ff010113          	add	sp,sp,-16
+   4:	00112623          	sw	ra,12(sp)
+   8:	00812423          	sw	s0,8(sp)
+   c:	01010413          	add	s0,sp,16
+  10:	000007b7          	lui	a5,0x0
+  14:	00f00713          	li	a4,15
+  18:	00e7a023          	sw	a4,0(a5) # 0 <main>
+  1c:	000007b7          	lui	a5,0x0
+  20:	0007a703          	lw	a4,0(a5) # 0 <main>
+  24:	000007b7          	lui	a5,0x0
+  28:	0007a783          	lw	a5,0(a5) # 0 <main>
+  2c:	00078593          	mv	a1,a5
+  30:	00070513          	mv	a0,a4
+  34:	00000097          	auipc	ra,0x0
+  38:	000080e7          	jalr	ra # 34 <main+0x34>
+  3c:	00050793          	mv	a5,a0
+  40:	00078513          	mv	a0,a5
+  44:	00c12083          	lw	ra,12(sp)
+  48:	00812403          	lw	s0,8(sp)
+  4c:	01010113          	add	sp,sp,16
+  50:	00008067          	ret
+```
 Стартап-файл (указываю, потому что много раз его менял и сбился):
+```asm
+  .section .starter
+  .global _poyehaliy
+_poyehaliy:
+  la    gp, _globl_ptr
+  la    sp, _stack_ptr
 
-.section .starter
+  la    t0, _bss_start
+  la    t1, _bss_end
 
-.global \_poyehaliy
+_bss_init_loop:
+  blt   t1, t0, _main_call
+  sw    zero, 0(t0)
+  addi  t0, t0, 4
+  j     _bss_init_loop
 
-\_poyehaliy:
+_main_call:
+  li    a0, 0
+  li    a1, 0
 
-la gp, \_globl_ptr
+  call  main
 
-la sp, \_stack_ptr
-
-la t0, \_bss_start
-
-la t1, \_bss_end
-
-\_bss_init_loop:
-
-blt t1, t0, \_main_call
-
-sw zero, 0(t0)
-
-addi t0, t0, 4
-
-j \_bss_init_loop
-
-\_main_call:
-
-li a0, 0
-
-li a1, 0
-
-call main
-
-\_endless_loop:
-
-j \_endless_loop
+_endless_loop:
+  j     _endless_loop
+```
 
 Сборка:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
-starter_simple.S -o starter_simple.o
-
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c starter_simple.S -o starter_simple.o
+```
 Линкер:
+```link
+OUTPUT_FORMAT("elf32-littleriscv")
 
-OUTPUT_FORMAT(\"elf32-littleriscv\")
-
-ENTRY(\_poyehaliy)
+ENTRY(_poyehaliy)
 
 MEMORY
-
 {
-
-command_meme (rx) : ORIGIN = 0x00000000, LENGTH = 1k
-
-data_meme (!rx) : ORIGIN = 0x00000000, LENGTH = 1k
-
+  command_meme (rx) : ORIGIN = 0x00000000, LENGTH = 1k
+  data_meme (!rx) : ORIGIN = 0x00000000, LENGTH = 1k
 }
 
 SECTIONS
-
 {
+  .text : {
+  *(.starter)
+  *(.text*)
+  } > command_meme
 
-.text : {
+  .data : AT (0x000FEFAF) {
+  _globl_ptr = . + 128;
+  *(.*data*)
+  } > data_meme
 
-\*(.starter)
+  . = ALIGN(4);
 
-\*(.text\*)
+  .bss : {
+  _bss_start = .;
+  *(.*bss*)
+  _bss_end = .;
+  } > data_meme
 
-} \> command_meme
+  . = LENGTH(data_meme);
+  _stack_ptr = ALIGN(32)-32;
 
-.data : AT (0x000FEFAF) {
-
-\_globl_ptr = . + 128;
-
-\*(.\*data\*)
-
-} \> data_meme
-
-. = ALIGN(4);
-
-.bss : {
-
-\_bss_start = .;
-
-\*(.\*bss\*)
-
-\_bss_end = .;
-
-} \> data_meme
-
-. = LENGTH(data_meme);
-
-\_stack_ptr = ALIGN(32)-32;
-
-ASSERT(\_stack_ptr \<= LENGTH(data_meme), \"Check_stack\")
-
+  ASSERT(_stack_ptr <= LENGTH(data_meme), "Check_stack")
 }
+```
 
 Команда для линковки:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32
--nostartfiles -T linker.ld starter_simple.o test.o -o t1.elf
-
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostartfiles -T linker.ld starter_simple.o test.o -o t1.elf
+```
 Дизассемблируем командой
-
+```bash
 \$ /c/riscv_cc/bin/riscv-none-elf-objdump -D t1.elf \> t1.S
-
+```
 Результат:
-
+```asm
 Disassembly of section .text:
 
-00000000 \<\_poyehaliy\>:
+00000000 <_poyehaliy>:
+   0:	08000193          	li	gp,128
+   4:	3e000113          	li	sp,992
+   8:	00000293          	li	t0,0
+   c:	00400313          	li	t1,4
 
-0: 08000193 li gp,128
+00000010 <_bss_init_loop>:
+  10:	00534863          	blt	t1,t0,20 <main>
+  14:	0002a023          	sw	zero,0(t0)
+  18:	00428293          	add	t0,t0,4
+  1c:	ff5ff06f          	j	10 <_bss_init_loop>
 
-4: 3e000113 li sp,992
+00000020 <main>:
+  20:	ff010113          	add	sp,sp,-16
+  24:	00112623          	sw	ra,12(sp)
+  28:	00812423          	sw	s0,8(sp)
+  2c:	01010413          	add	s0,sp,16
+  30:	00f00713          	li	a4,15
+  34:	00e02023          	sw	a4,0(zero) # 0 <_poyehaliy>
+  38:	00002703          	lw	a4,0(zero) # 0 <_poyehaliy>
+  3c:	00002783          	lw	a5,0(zero) # 0 <_poyehaliy>
+  40:	00078593          	mv	a1,a5
+  44:	00070513          	mv	a0,a4
+  48:	01c000ef          	jal	64 <__mulsi3>
+  4c:	00050793          	mv	a5,a0
+  50:	00078513          	mv	a0,a5
+  54:	00c12083          	lw	ra,12(sp)
+  58:	00812403          	lw	s0,8(sp)
+  5c:	01010113          	add	sp,sp,16
+  60:	00008067          	ret
 
-8: 00000293 li t0,0
+00000064 <__mulsi3>:
+  64:	00050613          	mv	a2,a0
+  68:	00000513          	li	a0,0
+  6c:	0015f693          	and	a3,a1,1
+  70:	00068463          	beqz	a3,78 <__mulsi3+0x14>
+  74:	00c50533          	add	a0,a0,a2
+  78:	0015d593          	srl	a1,a1,0x1
+  7c:	00161613          	sll	a2,a2,0x1
 
-c: 00400313 li t1,4
-
-00000010 \<\_bss_init_loop\>:
-
-10: 00534863 blt t1,t0,20 \<main\>
-
-14: 0002a023 sw zero,0(t0)
-
-18: 00428293 add t0,t0,4
-
-1c: ff5ff06f j 10 \<\_bss_init_loop\>
-
-00000020 \<main\>:
-
-20: ff010113 add sp,sp,-16
-
-24: 00112623 sw ra,12(sp)
-
-28: 00812423 sw s0,8(sp)
-
-2c: 01010413 add s0,sp,16
-
-30: 00f00713 li a4,15
-
-34: 00e02023 sw a4,0(zero) \# 0 \<\_poyehaliy\>
-
-38: 00002703 lw a4,0(zero) \# 0 \<\_poyehaliy\>
-
-3c: 00002783 lw a5,0(zero) \# 0 \<\_poyehaliy\>
-
-40: 00078593 mv a1,a5
-
-44: 00070513 mv a0,a4
-
-48: 01c000ef jal 64 \<\_\_mulsi3\>
-
-4c: 00050793 mv a5,a0
-
-50: 00078513 mv a0,a5
-
-54: 00c12083 lw ra,12(sp)
-
-58: 00812403 lw s0,8(sp)
-
-5c: 01010113 add sp,sp,16
-
-60: 00008067 ret
-
-00000064 \<\_\_mulsi3\>:
-
-64: 00050613 mv a2,a0
-
-68: 00000513 li a0,0
-
-6c: 0015f693 and a3,a1,1
-
-70: 00068463 beqz a3,78 \<\_\_mulsi3+0x14\>
-
-74: 00c50533 add a0,a0,a2
-
-78: 0015d593 srl a1,a1,0x1
-
-7c: 00161613 sll a2,a2,0x1
-
-00000080 \<\_globl_ptr\>:
-
-80: fe0596e3 bnez a1,6c \<\_\_mulsi3+0x8\>
-
-84: 00008067 ret
-
+00000080 <_globl_ptr>:
+  80:	fe0596e3          	bnez	a1,6c <__mulsi3+0x8>
+  84:	00008067          	ret
+```
 Поскольку адреса памяти перекрываются, компилятор пишет данные на место
 инструкций и не волнуется (если не написать AT в линкере, может выдать
 ошибку, я не пробовал). Данные теперь пишутся не в стек, а в начало
@@ -1392,37 +1215,29 @@ c: 00400313 li t1,4
 
 Добавим объявленную переменную. Читателю предлагается убедиться, что в
 программе ниже секция данных уже не будет пустой.
-
+```cpp
 int x;
-
 int y = -3;
-
 int main ()
-
 {
-
-x = 15;
-
-return x\*y;
-
+	x = 15;
+	return x*y;
 }
+```
 
 Предполагается, что вы найдёте следующее:
-
+```asm
 Disassembly of section .data:
 
-00000000 \<y\>:
-
-0: fffd .insn 2, 0xfffd
-
-2: ffff .insn 2, 0xffff
-
+00000000 <y>:
+   0:	fffd                	.insn	2, 0xfffd
+   2:	ffff                	.insn	2, 0xffff
+```
 bss при этом сдвинется, как и должно быть
-
+```asm
 8: 00400293 li t0,4
-
 c: 00800313 li t1,8
-
+```
 Здесь говорится, что y=-3 (FFFFFFFD). Однако, ассемблерного кода тут нет
 вовсе. В прошивке для нашего процессора придётся избегать таких
 объявлений, так как с помощью readmem мы прошиваем только память
@@ -1434,102 +1249,66 @@ c: 00800313 li t1,8
 -3 на 15.
 
 Программа:
-
+```cpp
 int main() {
-
-int a = -15;
-
-int b = 3;
-
-return a \* b;
-
+  int a = -15;
+  int b = 3;
+  return a * b;
 }
+```
 
 Стартап и линкер не меняем. Ассемблер (неправильный, но гонять пока
 будем его):
+```asm
+t2.elf:     file format elf32-littleriscv
 
-t2.elf: file format elf32-littleriscv
 
 Disassembly of section .text:
 
-00000000 \<\_bss_end\>:
+00000000 <_bss_end>:
+   0:	08000193          	li	gp,128
+   4:	3e000113          	li	sp,992
+   8:	00000293          	li	t0,0
+   c:	00000313          	li	t1,0
 
-0: 08000193 li gp,128
+00000010 <_bss_init_loop>:
+  10:	00534863          	blt	t1,t0,20 <main>
+  14:	0002a023          	sw	zero,0(t0)
+  18:	00428293          	add	t0,t0,4
+  1c:	ff5ff06f          	j	10 <_bss_init_loop>
 
-4: 3e000113 li sp,992
+00000020 <main>:
+  20:	fe010113          	add	sp,sp,-32
+  24:	00112e23          	sw	ra,28(sp)
+  28:	00812c23          	sw	s0,24(sp)
+  2c:	02010413          	add	s0,sp,32
+  30:	ff100793          	li	a5,-15
+  34:	fef42623          	sw	a5,-20(s0)
+  38:	00300793          	li	a5,3
+  3c:	fef42423          	sw	a5,-24(s0)
+  40:	fe842583          	lw	a1,-24(s0)
+  44:	fec42503          	lw	a0,-20(s0)
+  48:	01c000ef          	jal	64 <__mulsi3>
+  4c:	00050793          	mv	a5,a0
+  50:	00078513          	mv	a0,a5
+  54:	01c12083          	lw	ra,28(sp)
+  58:	01812403          	lw	s0,24(sp)
+  5c:	02010113          	add	sp,sp,32
+  60:	00008067          	ret
 
-8: 00000293 li t0,0
+00000064 <__mulsi3>:
+  64:	00050613          	mv	a2,a0
+  68:	00000513          	li	a0,0
+  6c:	0015f693          	and	a3,a1,1
+  70:	00068463          	beqz	a3,78 <__mulsi3+0x14>
+  74:	00c50533          	add	a0,a0,a2
+  78:	0015d593          	srl	a1,a1,0x1
+  7c:	00161613          	sll	a2,a2,0x1
 
-c: 00000313 li t1,0
-
-00000010 \<\_bss_init_loop\>:
-
-10: 00534863 blt t1,t0,20 \<main\>
-
-14: 0002a023 sw zero,0(t0)
-
-18: 00428293 add t0,t0,4
-
-1c: ff5ff06f j 10 \<\_bss_init_loop\>
-
-00000020 \<main\>:
-
-20: fe010113 add sp,sp,-32
-
-24: 00112e23 sw ra,28(sp)
-
-28: 00812c23 sw s0,24(sp)
-
-2c: 02010413 add s0,sp,32
-
-30: ff100793 li a5,-15
-
-34: fef42623 sw a5,-20(s0)
-
-38: 00300793 li a5,3
-
-3c: fef42423 sw a5,-24(s0)
-
-40: fe842583 lw a1,-24(s0)
-
-44: fec42503 lw a0,-20(s0)
-
-48: 01c000ef jal 64 \<\_\_mulsi3\>
-
-4c: 00050793 mv a5,a0
-
-50: 00078513 mv a0,a5
-
-54: 01c12083 lw ra,28(sp)
-
-58: 01812403 lw s0,24(sp)
-
-5c: 02010113 add sp,sp,32
-
-60: 00008067 ret
-
-00000064 \<\_\_mulsi3\>:
-
-64: 00050613 mv a2,a0
-
-68: 00000513 li a0,0
-
-6c: 0015f693 and a3,a1,1
-
-70: 00068463 beqz a3,78 \<\_\_mulsi3+0x14\>
-
-74: 00c50533 add a0,a0,a2
-
-78: 0015d593 srl a1,a1,0x1
-
-7c: 00161613 sll a2,a2,0x1
-
-00000080 \<\_globl_ptr\>:
-
-80: fe0596e3 bnez a1,6c \<\_\_mulsi3+0x8\>
-
-84: 00008067 ret
-
+00000080 <_globl_ptr>:
+  80:	fe0596e3          	bnez	a1,6c <__mulsi3+0x8>
+  84:	00008067          	ret
+```
 Команды:
 
 \$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
