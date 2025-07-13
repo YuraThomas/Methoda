@@ -725,7 +725,7 @@ little-endian, поэтому младший байт идёт в конец с�
 
 Сначала **напишем линкер.** Структура его такая:
 
-```cpp
+```ld
 OUTPUT_FORMAT("elf32-littleriscv")
 
 ENTRY(_start) //тут пишем штуку, после которой будет первая исполняемая команда
@@ -757,13 +757,13 @@ https://home.cs.colorado.edu/\~main/cs1300/doc/gnu/ld_3.html#IDX338
 избегаться. Можно писать только одну команду MEMORY. Формат описания
 памяти:
 
-```txt
+```ld
 
 имя (необязательные сведения о доступе) : ORIGIN = адрес начала, LENGTH = длина в битах
 ```
 
 Памяти у нас две, их описание будет выглядеть примерно так:
-```txt
+```ld
 command_meme (rx) : ORIGIN = 0x00000000, LENGTH = 128
 data_meme (!rx) : ORIGIN = 0x00000000, LENGTH = 256
 ```
@@ -782,7 +782,7 @@ X -- значит исполняемая секция, то есть, коман
 Суть синтаксиса SECTIONS такая: компилятор по правилам, записанным в
 линкере, преобразует несколько объектных файлов в один исполняемый
 (компонует, собирает). Поэтому мы должны перечислить выходные секции:
-```cpp
+```ld
 SECTIONS
 {
   .starter
@@ -805,7 +805,7 @@ SECTIONS
 из объектных файлов и просто записывать их в фигурных скобках. Искать их
 будем, задавая шаблон. Как обычно, "\*" - любая последовательность, "?"
 -- один символ.
-```cpp
+```ld
 SECTIONS
 {
   .starter : {
@@ -1309,19 +1309,19 @@ Disassembly of section .text:
   80:	fe0596e3          	bnez	a1,6c <__mulsi3+0x8>
   84:	00008067          	ret
 ```
-Команды:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
-return_ab.c -o return_ab.o
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32
--nostartfiles -T linker.ld starter_simple.o return_ab.o -o t2.elf
-
+**Команды:**
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c return_ab.c -o return_ab.o
+```
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostartfiles -T linker.ld starter_simple.o return_ab.o -o t2.elf
+```
+```bash
 \$ /c/riscv_cc/bin/riscv-none-elf-objdump -D t2.elf \> t2.S
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objcopy -O verilog
-\--verilog-data-width=4 t2.elf t2.meme
-
+```
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-objcopy -O verilog \--verilog-data-width=4 t2.elf t2.meme
+```
 Заходим в моделсим, грузим в проект файлы проца, грузим в папку проца и
 в проект прошивку, запускаем симуляцию.
 
@@ -1336,9 +1336,9 @@ height="5.306380139982502in"}
 height="0.718507217847769in"}
 
 Смотрим на дизассемблер:
-
+```asm
 60: 00008067 ret
-
+```
 Расшифруем команду. Простой способ, применимый для одной команды:
 скопировать hex-представление из дизассемблера, вставить в калькулятор,
 перевести в бинарный вид.
@@ -1353,10 +1353,10 @@ height="2.18463801399825in"}
 
 Узнаём, что ret является на самом деле инструкцией jalr ra, 0(0). Ищем
 ra в дизассемблере:
-
+```asm
 24: 00112e23 sw ra,28(sp)
-
 54: 01c12083 lw ra,28(sp)
+```
 
 Выясняем причину ухода в x-состояние: в дизайне использован регистровый
 файл без сигнала сброса, поэтому начальное состояние регистра ra в
@@ -1370,107 +1370,71 @@ main. Когда-то я убирал часть с вызовом и, види�
 неисправный стартап-файл.
 
 Программа:
+```asm
+t3.elf:     file format elf32-littleriscv
 
-t3.elf: file format elf32-littleriscv
 
 Disassembly of section .text:
 
-00000000 \<\_bss_end\>:
+00000000 <_bss_end>:
+   0:	08000193          	li	gp,128
+   4:	3e000113          	li	sp,992
+   8:	00000293          	li	t0,0
+   c:	00000313          	li	t1,0
 
-0: 08000193 li gp,128
+00000010 <_bss_init_loop>:
+  10:	00534863          	blt	t1,t0,20 <_main_call>
+  14:	0002a023          	sw	zero,0(t0)
+  18:	00428293          	add	t0,t0,4
+  1c:	ff5ff06f          	j	10 <_bss_init_loop>
 
-4: 3e000113 li sp,992
+00000020 <_main_call>:
+  20:	00000513          	li	a0,0
+  24:	00000593          	li	a1,0
+  28:	008000ef          	jal	30 <main>
 
-8: 00000293 li t0,0
+0000002c <_endless_loop>:
+  2c:	0000006f          	j	2c <_endless_loop>
 
-c: 00000313 li t1,0
+00000030 <main>:
+  30:	fe010113          	add	sp,sp,-32
+  34:	00112e23          	sw	ra,28(sp)
+  38:	00812c23          	sw	s0,24(sp)
+  3c:	02010413          	add	s0,sp,32
+  40:	ff100793          	li	a5,-15
+  44:	fef42623          	sw	a5,-20(s0)
+  48:	00300793          	li	a5,3
+  4c:	fef42423          	sw	a5,-24(s0)
+  50:	fe842583          	lw	a1,-24(s0)
+  54:	fec42503          	lw	a0,-20(s0)
+  58:	01c000ef          	jal	74 <__mulsi3>
+  5c:	00050793          	mv	a5,a0
+  60:	00078513          	mv	a0,a5
+  64:	01c12083          	lw	ra,28(sp)
+  68:	01812403          	lw	s0,24(sp)
+  6c:	02010113          	add	sp,sp,32
+  70:	00008067          	ret
 
-00000010 \<\_bss_init_loop\>:
+00000074 <__mulsi3>:
+  74:	00050613          	mv	a2,a0
+  78:	00000513          	li	a0,0
+  7c:	0015f693          	and	a3,a1,1
 
-10: 00534863 blt t1,t0,20 \<\_main_call\>
-
-14: 0002a023 sw zero,0(t0)
-
-18: 00428293 add t0,t0,4
-
-1c: ff5ff06f j 10 \<\_bss_init_loop\>
-
-00000020 \<\_main_call\>:
-
-20: 00000513 li a0,0
-
-24: 00000593 li a1,0
-
-28: 008000ef jal 30 \<main\>
-
-0000002c \<\_endless_loop\>:
-
-2c: 0000006f j 2c \<\_endless_loop\>
-
-00000030 \<main\>:
-
-30: fe010113 add sp,sp,-32
-
-34: 00112e23 sw ra,28(sp)
-
-38: 00812c23 sw s0,24(sp)
-
-3c: 02010413 add s0,sp,32
-
-40: ff100793 li a5,-15
-
-44: fef42623 sw a5,-20(s0)
-
-48: 00300793 li a5,3
-
-4c: fef42423 sw a5,-24(s0)
-
-50: fe842583 lw a1,-24(s0)
-
-54: fec42503 lw a0,-20(s0)
-
-58: 01c000ef jal 74 \<\_\_mulsi3\>
-
-5c: 00050793 mv a5,a0
-
-60: 00078513 mv a0,a5
-
-64: 01c12083 lw ra,28(sp)
-
-68: 01812403 lw s0,24(sp)
-
-6c: 02010113 add sp,sp,32
-
-70: 00008067 ret
-
-00000074 \<\_\_mulsi3\>:
-
-74: 00050613 mv a2,a0
-
-78: 00000513 li a0,0
-
-7c: 0015f693 and a3,a1,1
-
-00000080 \<\_globl_ptr\>:
-
-80: 00068463 beqz a3,88 \<\_globl_ptr+0x8\>
-
-84: 00c50533 add a0,a0,a2
-
-88: 0015d593 srl a1,a1,0x1
-
-8c: 00161613 sll a2,a2,0x1
-
-90: fe0596e3 bnez a1,7c \<\_\_mulsi3+0x8\>
-
-94: 00008067 ret
+00000080 <_globl_ptr>:
+  80:	00068463          	beqz	a3,88 <_globl_ptr+0x8>
+  84:	00c50533          	add	a0,a0,a2
+  88:	0015d593          	srl	a1,a1,0x1
+  8c:	00161613          	sll	a2,a2,0x1
+  90:	fe0596e3          	bnez	a1,7c <__mulsi3+0x8>
+  94:	00008067          	ret
+```
 
 Результат:
 
 ![](media/image18.png){width="6.496527777777778in" height="5.30625in"}
 
 **Тут говина, пока убирать не буду, хотя вряд ли понадобится**
-
+```bash
 Команды для компиляции и дизассемблирования
 
 anthon@logik MINGW64 /c/riscv_compilation/aps
@@ -1756,8 +1720,7 @@ starter.S -o starter_cmprs.o
 
 anthon@logik MINGW64 /c/riscv_compilation/return_ab
 
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32
--nostartfiles -Wl,\--gc-sections -T linker.ld starter_cmprs.o
+\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostartfiles -Wl,\--gc-sections -T linker.ld starter_cmprs.o
 return_ab_cmprs.o -o return_ab_cmprs.elf
 
 anthon@logik MINGW64 /c/riscv_compilation/return_ab
@@ -1766,5 +1729,4 @@ anthon@logik MINGW64 /c/riscv_compilation/return_ab
 return_ab_cmprs_disasm.S
 
 anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$
+```
