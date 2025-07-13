@@ -326,397 +326,219 @@ int main() {
 ```
 
 Результат:
+```asm
 
-.file \"main.cpp\"
-
-.option nopic
-
-.attribute arch, \"rv32i2p1_zicsr2p0\"
-
-.attribute unaligned_access, 0
-
-.attribute stack_align, 16
-
-.text
-
-.globl \_\_mulsi3
-
-.align 2
-
-.globl \_Z3mulii
-
-.type \_Z3mulii, \@function
-
-\_Z3mulii:
-
+	.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv32i2p1_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+	.text
+	.globl	__mulsi3
+	.align	2
+	.globl	_Z3mulii
+	.type	_Z3mulii, @function
+_Z3mulii:
 .LFB0:
-
-.cfi_startproc
-
-addi sp,sp,-32
-
-.cfi_def_cfa_offset 32
-
-sw ra,28(sp)
-
-sw s0,24(sp)
-
-.cfi_offset 1, -4
-
-.cfi_offset 8, -8
-
-addi s0,sp,32
-
-.cfi_def_cfa 8, 0
-
-sw a0,-20(s0)
-
-sw a1,-24(s0)
-
-lw a1,-24(s0)
-
-lw a0,-20(s0)
-
-call \_\_mulsi3
-
-mv a5,a0
-
-mv a0,a5
-
-lw ra,28(sp)
-
-.cfi_restore 1
-
-lw s0,24(sp)
-
-.cfi_restore 8
-
-.cfi_def_cfa 2, 32
-
-addi sp,sp,32
-
-.cfi_def_cfa_offset 0
-
-jr ra
-
-.cfi_endproc
-
+	.cfi_startproc
+	addi	sp,sp,-32
+	.cfi_def_cfa_offset 32
+	sw	ra,28(sp)
+	sw	s0,24(sp)
+	.cfi_offset 1, -4
+	.cfi_offset 8, -8
+	addi	s0,sp,32
+	.cfi_def_cfa 8, 0
+	sw	a0,-20(s0)
+	sw	a1,-24(s0)
+	lw	a1,-24(s0)
+	lw	a0,-20(s0)
+	call	__mulsi3
+	mv	a5,a0
+	mv	a0,a5
+	lw	ra,28(sp)
+	.cfi_restore 1
+	lw	s0,24(sp)
+	.cfi_restore 8
+	.cfi_def_cfa 2, 32
+	addi	sp,sp,32
+	.cfi_def_cfa_offset 0
+	jr	ra
+	.cfi_endproc
 .LFE0:
-
-.size \_Z3mulii, .-\_Z3mulii
-
-.align 2
-
-.globl main
-
-.type main, \@function
-
+	.size	_Z3mulii, .-_Z3mulii
+	.align	2
+	.globl	main
+	.type	main, @function
 main:
-
 .LFB1:
-
-.cfi_startproc
-
-addi sp,sp,-32
-
-.cfi_def_cfa_offset 32
-
-sw ra,28(sp)
-
-sw s0,24(sp)
-
-.cfi_offset 1, -4
-
-.cfi_offset 8, -8
-
-addi s0,sp,32
-
-.cfi_def_cfa 8, 0
-
-li a5,-15
-
-sw a5,-20(s0)
-
-li a5,3
-
-sw a5,-24(s0)
-
-lw a1,-24(s0)
-
-lw a0,-20(s0)
-
-call \_Z3mulii
-
-li a5,0
-
-mv a0,a5
-
-lw ra,28(sp)
-
-.cfi_restore 1
-
-lw s0,24(sp)
-
-.cfi_restore 8
-
-.cfi_def_cfa 2, 32
-
-addi sp,sp,32
-
-.cfi_def_cfa_offset 0
-
-jr ra
-
-.cfi_endproc
-
+	.cfi_startproc
+	addi	sp,sp,-32
+	.cfi_def_cfa_offset 32
+	sw	ra,28(sp)
+	sw	s0,24(sp)
+	.cfi_offset 1, -4
+	.cfi_offset 8, -8
+	addi	s0,sp,32
+	.cfi_def_cfa 8, 0
+	li	a5,-15
+	sw	a5,-20(s0)
+	li	a5,3
+	sw	a5,-24(s0)
+	lw	a1,-24(s0)
+	lw	a0,-20(s0)
+	call	_Z3mulii
+	li	a5,0
+	mv	a0,a5
+	lw	ra,28(sp)
+	.cfi_restore 1
+	lw	s0,24(sp)
+	.cfi_restore 8
+	.cfi_def_cfa 2, 32
+	addi	sp,sp,32
+	.cfi_def_cfa_offset 0
+	jr	ra
+	.cfi_endproc
 .LFE1:
-
-.size main, .-main
-
-.ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
-
+	.size	main, .-main
+	.ident	"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0"
+```
 Оптимизация --O1:
+```asm
 
-.file \"main.cpp\"
-
-.option nopic
-
-.attribute arch, \"rv32i2p1_zicsr2p0\"
-
-.attribute unaligned_access, 0
-
-.attribute stack_align, 16
-
-.text
-
-.globl \_\_mulsi3
-
-.align 2
-
-.globl \_Z3mulii
-
-.type \_Z3mulii, \@function
-
-\_Z3mulii:
-
+	.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv32i2p1_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+	.text
+	.globl	__mulsi3
+	.align	2
+	.globl	_Z3mulii
+	.type	_Z3mulii, @function
+_Z3mulii:
 .LFB0:
-
-.cfi_startproc
-
-addi sp,sp,-16
-
-.cfi_def_cfa_offset 16
-
-sw ra,12(sp)
-
-.cfi_offset 1, -4
-
-call \_\_mulsi3
-
-lw ra,12(sp)
-
-.cfi_restore 1
-
-addi sp,sp,16
-
-.cfi_def_cfa_offset 0
-
-jr ra
-
-.cfi_endproc
-
+	.cfi_startproc
+	addi	sp,sp,-16
+	.cfi_def_cfa_offset 16
+	sw	ra,12(sp)
+	.cfi_offset 1, -4
+	call	__mulsi3
+	lw	ra,12(sp)
+	.cfi_restore 1
+	addi	sp,sp,16
+	.cfi_def_cfa_offset 0
+	jr	ra
+	.cfi_endproc
 .LFE0:
-
-.size \_Z3mulii, .-\_Z3mulii
-
-.align 2
-
-.globl main
-
-.type main, \@function
-
+	.size	_Z3mulii, .-_Z3mulii
+	.align	2
+	.globl	main
+	.type	main, @function
 main:
-
 .LFB1:
-
-.cfi_startproc
-
-li a0,0
-
-ret
-
-.cfi_endproc
-
+	.cfi_startproc
+	li	a0,0
+	ret
+	.cfi_endproc
 .LFE1:
-
-.size main, .-main
-
-.ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
+	.size	main, .-main
+	.ident	"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0"
+```
 
 Большой бесполезный мусор. Обе функции скомпилированы, но умножение не
 вызывается, т.к. main никуда данные не передаёт. Для лучшей читаемости
 оставим лишь функцию умножения (скомпилируем отдельно, так можно и в
 реальном проекте) без main:
 
-\`\`\`cpp
-
+```cpp
 int mul(int a, int b) {
-
-return a \* b;
-
+  return a * b;
 }
-
-/\*
-
+/*
 int main() {
+	int a = -15;
+	int b = 3;
+	mul(a, b);
+}*/
+```
 
-int a = -15;
-
-int b = 3;
-
-mul(a, b);
-
-}\*/
-
-\`\`\`
 
 Результат:
+```asm
 
-.file \"main.cpp\"
-
-.option nopic
-
-.attribute arch, \"rv32i2p1_zicsr2p0\"
-
-.attribute unaligned_access, 0
-
-.attribute stack_align, 16
-
-.text
-
-.globl \_\_mulsi3
-
-.align 2
-
-.globl \_Z3mulii
-
-.type \_Z3mulii, \@function
-
-\_Z3mulii:
-
+	.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv32i2p1_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+	.text
+	.globl	__mulsi3
+	.align	2
+	.globl	_Z3mulii
+	.type	_Z3mulii, @function
+_Z3mulii:
 .LFB0:
-
-.cfi_startproc
-
-addi sp,sp,-32
-
-.cfi_def_cfa_offset 32
-
-sw ra,28(sp)
-
-sw s0,24(sp)
-
-.cfi_offset 1, -4
-
-.cfi_offset 8, -8
-
-addi s0,sp,32
-
-.cfi_def_cfa 8, 0
-
-sw a0,-20(s0)
-
-sw a1,-24(s0)
-
-lw a1,-24(s0)
-
-lw a0,-20(s0)
-
-call \_\_mulsi3
-
-mv a5,a0
-
-mv a0,a5
-
-lw ra,28(sp)
-
-.cfi_restore 1
-
-lw s0,24(sp)
-
-.cfi_restore 8
-
-.cfi_def_cfa 2, 32
-
-addi sp,sp,32
-
-.cfi_def_cfa_offset 0
-
-jr ra
-
-.cfi_endproc
-
+	.cfi_startproc
+	addi	sp,sp,-32
+	.cfi_def_cfa_offset 32
+	sw	ra,28(sp)
+	sw	s0,24(sp)
+	.cfi_offset 1, -4
+	.cfi_offset 8, -8
+	addi	s0,sp,32
+	.cfi_def_cfa 8, 0
+	sw	a0,-20(s0)
+	sw	a1,-24(s0)
+	lw	a1,-24(s0)
+	lw	a0,-20(s0)
+	call	__mulsi3
+	mv	a5,a0
+	mv	a0,a5
+	lw	ra,28(sp)
+	.cfi_restore 1
+	lw	s0,24(sp)
+	.cfi_restore 8
+	.cfi_def_cfa 2, 32
+	addi	sp,sp,32
+	.cfi_def_cfa_offset 0
+	jr	ra
+	.cfi_endproc
 .LFE0:
-
-.size \_Z3mulii, .-\_Z3mulii
-
-.ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
+	.size	_Z3mulii, .-_Z3mulii
+	.ident	"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0"
+```
 
 Оптимизация --O1:
-
-.file \"main.cpp\"
-
-.option nopic
-
-.attribute arch, \"rv32i2p1_zicsr2p0\"
-
-.attribute unaligned_access, 0
-
-.attribute stack_align, 16
-
-.text
-
-.globl \_\_mulsi3
-
-.align 2
-
-.globl \_Z3mulii
-
-.type \_Z3mulii, \@function
-
-\_Z3mulii:
-
+```asm
+	.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv32i2p1_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+	.text
+	.globl	__mulsi3
+	.align	2
+	.globl	_Z3mulii
+	.type	_Z3mulii, @function
+_Z3mulii:
 .LFB0:
-
-.cfi_startproc
-
-addi sp,sp,-16
-
-.cfi_def_cfa_offset 16
-
-sw ra,12(sp)
-
-.cfi_offset 1, -4
-
-call \_\_mulsi3
-
-lw ra,12(sp)
-
-.cfi_restore 1
-
-addi sp,sp,16
-
-.cfi_def_cfa_offset 0
-
-jr ra
-
-.cfi_endproc
-
+	.cfi_startproc
+	addi	sp,sp,-16
+	.cfi_def_cfa_offset 16
+	sw	ra,12(sp)
+	.cfi_offset 1, -4
+	call	__mulsi3
+	lw	ra,12(sp)
+	.cfi_restore 1
+	addi	sp,sp,16
+	.cfi_def_cfa_offset 0
+	jr	ra
+	.cfi_endproc
 .LFE0:
-
-.size \_Z3mulii, .-\_Z3mulii
-
-.ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
+	.size	_Z3mulii, .-_Z3mulii
+	.ident	"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0"
+```
 
 Пробуем --O2, результат тот же.
 
