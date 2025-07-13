@@ -32,7 +32,7 @@ rv32i_zicsr. I -- это обязательные команды; zicsr -- ка�
 int main() {
   int a = -15;
   int b = 3;
-  int c = a\*b;
+  int c = a*b;
   return 0;
 }
 ```
