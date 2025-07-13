@@ -26,7 +26,7 @@
 
 <https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-1/xpack-riscv-none-elf-gcc-13.2.0-1-win32-x64.zip>
 
-##Учимся компилировать на ассемблер
+## Учимся компилировать на ассемблер
 
 Графического интерфейса нет, запускаем командную строку. Пусть мы хотим
 перемножать -3 и 15. Программа:
@@ -107,7 +107,7 @@ main:
 Сделаем вывод о том, что S говорит компилятору сделать ассемблер для
 чтения. С тем, что было создано раньше, разберёмся позже.
 
-##Оптимизация
+## Оптимизация
 
 Для оптимизации в компиляторе есть специальные настройки. Можно
 передавать следующие флаги: -O0, -O1, -O2, -O3, -Os (по размеру), -Og
@@ -539,7 +539,7 @@ _Z3mulii:
 
 Пробуем --O2, результат тот же.
 
-##Компиляция для прошивки
+## Компиляция для прошивки
 
 Чтобы запустить что-то на процессоре, нужно перенести это в бинарный
 формат.
@@ -890,6 +890,7 @@ SECTIONS
 оставим нулями. После main добавим бесконечный цикл.
 
 Итоговый стартап-файл:
+
 ```asm
   .section .starter
   .global _poyehaliy
@@ -919,6 +920,7 @@ _endless_loop:
 вызывал лишних вопросов.
 
 Типовая команда для сборки:
+
 ```bash
 \$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c файл.расширение -o файл.o
 ```
@@ -932,9 +934,11 @@ mabi устанавливает размер переменных (int, long, po
 
 Линкер собирать не нужно, это скрипт для компилятора. Линковка делается
 командой:
+
 ```bash
 \$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostartfiles -T linker.ld файл1.o файл2.o -o эльф.elf
 ```
+
 Здесь есть несколько полезных опций. nostartfiles говорит не
 использовать стандартный стартап-файл (у нас он не поместится в память).
 Можно также указать --nostdlib, чтобы стандартная библиотека не
@@ -956,6 +960,7 @@ objcopy.
 ![](media_c/image13.png)
 
 Смотрим дизасм:
+
 ```asm
 00000000 <_bss_end>:
    0:	08000193          	li	gp,128
@@ -1018,21 +1023,22 @@ Disassembly of section .comment:
 глобальную переменную.
 
 Программа:
+
 ```cpp
 int x;
 int main ()
 {
-	x = 15;
-	return x*x;
+  x = 15;
+  return x*x;
 }
 ```
 Команда для сборки:
 ```bash
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c test.c -o test.o
+/c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c test.c -o test.o
 ```
 Команда для дизассемблирования:
 ```bash
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D test.o \> t1.S
+/c/riscv_cc/bin/riscv-none-elf-objdump -D test.o \> t1.S
 ```
 Результат:
 ```asm
@@ -1061,7 +1067,9 @@ Disassembly of section .text:
   4c:	01010113          	add	sp,sp,16
   50:	00008067          	ret
 ```
+
 Стартап-файл (указываю, потому что много раз его менял и сбился):
+
 ```asm
   .section .starter
   .global _poyehaliy
@@ -1089,10 +1097,13 @@ _endless_loop:
 ```
 
 Сборка:
+
 ```bash
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c starter_simple.S -o starter_simple.o
+/c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c starter_simple.S -o starter_simple.o
 ```
+
 Линкер:
+
 ```ld
 OUTPUT_FORMAT("elf32-littleriscv")
 
@@ -1132,12 +1143,15 @@ SECTIONS
 ```
 
 Команда для линковки:
+
 ```bash
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostartfiles -T linker.ld starter_simple.o test.o -o t1.elf
+/c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostartfiles -T linker.ld starter_simple.o test.o -o t1.elf
 ```
+
 Дизассемблируем командой
+
 ```bash
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D t1.elf \> t1.S
+/c/riscv_cc/bin/riscv-none-elf-objdump -D t1.elf \> t1.S
 ```
 Результат:
 ```asm
@@ -1199,10 +1213,9 @@ Disassembly of section .text:
 ```cpp
 int x;
 int y = -3;
-int main ()
-{
-	x = 15;
-	return x*y;
+int main () {
+  x = 15;
+  return x*y;
 }
 ```
 
