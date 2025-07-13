@@ -1112,7 +1112,7 @@ _endless_loop:
 \$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c starter_simple.S -o starter_simple.o
 ```
 Линкер:
-```link
+```ld
 OUTPUT_FORMAT("elf32-littleriscv")
 
 ENTRY(_poyehaliy)
