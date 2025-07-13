@@ -205,7 +205,6 @@ main:
 
 Результат:
 ```asm
-Результат:
 	.file	"main.cpp"
 	.option nopic
 	.attribute arch, "rv32i2p1_zicsr2p0"
@@ -244,7 +243,7 @@ int main() {
 
 Команда та же, что раньше, без оптимизаций. Результат:
 ```asm
-		.file	"main.cpp"
+	.file	"main.cpp"
 	.option nopic
 	.attribute arch, "rv32i2p1_zicsr2p0"
 	.attribute unaligned_access, 0
@@ -290,6 +289,7 @@ main:
 
 В целом, то же самое. Вводим оптимизацию (1):
 ```asm
+
 	.file	"main.cpp"
 	.option nopic
 	.attribute arch, "rv32i2p1_zicsr2p0"
@@ -313,8 +313,9 @@ main:
 Считает a*b не совсем функция, а скорее компилятор. Ну что ж, мы просили для конкретных чисел, попробуем для входных значений a и b.
 
 ```cpp
+
 int mul(int a, int b) {
-  return a * b;
+	return a * b;
 }
 
 int main() {
@@ -322,7 +323,7 @@ int main() {
 	int b = 3;
 	mul(a, b);
 }
-
+```
 
 Результат:
 
