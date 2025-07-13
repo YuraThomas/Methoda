@@ -28,7 +28,6 @@ rv32i_zicsr. I -- это обязательные команды; zicsr -- ка�
 перемножать -3 и 15. Программа:
 
 ```cpp
-
 int main() {
   int a = -15;
   int b = 3;
@@ -40,10 +39,7 @@ int main() {
 Команда:
 
 ```bash
-
-anthon@logik MINGW64 /c/riscv_compilation/TEST
-
-\$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=rv32i_zicsr -mabi=ilp32 main.cpp -o main.s
+/c/riscv_cc/bin/riscv-none-elf-g++ -march=rv32i_zicsr -mabi=ilp32 main.cpp -o main.s
 ```
 
 Результат -- нечитаемая бяка, visual studio вовсе отказывается открывать
