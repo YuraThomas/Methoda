@@ -561,13 +561,13 @@ linkable file". Executable -- значит исполняемый, его мож
 ```
 Результат:
 
-![](media/image1.png){width="6.496527777777778in"
+![](media_с/image1.png){width="6.496527777777778in"
 height="5.777746062992126in"}
 
 Полученный результат бесполезен с точки зрения чтения. Чуть лучше
 результат в HEX-редакторе (можно анализировать байты):
 
-![](media/image2.png){width="3.689607392825897in"
+![](media_с/image2.png){width="3.689607392825897in"
 height="5.525709755030621in"}
 
 Однако, в компиляторе есть специальная утилита readelf, которая
@@ -576,7 +576,7 @@ height="5.525709755030621in"}
 Опции (подсказки, на мой взгляд, достаточно информативны, чтобы их
 содержимое не переписывать):
 
-![](media/image3.png){width="3.22663823272091in"
+![](media_с/image3.png){width="3.22663823272091in"
 height="5.403383639545057in"}
 
 Команда:
@@ -588,10 +588,10 @@ height="5.403383639545057in"}
 
 Результат:
 
-![](media/image4.png){width="6.496527777777778in"
+![](media_с/image4.png){width="6.496527777777778in"
 height="6.161945538057743in"}
 
-![](media/image5.png){width="3.008552055993001in"
+![](media_с/image5.png){width="3.008552055993001in"
 height="3.2656342957130358in"}![](media/image5.png){width="3.008552055993001in"
 height="2.903260061242345in"}
 
@@ -600,7 +600,7 @@ height="2.903260061242345in"}
 
 Справка:
 
-![](media/image6.png){width="3.0012685914260717in"
+![](media_с/image6.png){width="3.0012685914260717in"
 height="3.1112062554680664in"}![](media/image7.png){width="3.4630030621172354in"
 height="4.584354768153981in"}
 
@@ -614,7 +614,7 @@ height="4.584354768153981in"}
 
 Вырезка результата с, содержащая main и функцию умножения:
 
-![](media/image8.png){width="4.443112423447069in"
+![](media_с/image8.png){width="4.443112423447069in"
 height="3.357435476815398in"}
 
 Можно заметить, что здесь автоматически есть всё, что нужно для работы
@@ -636,7 +636,7 @@ height="3.357435476815398in"}
 
 Результат:
 
-![](media/image9.png){width="3.829267279090114in"
+![](media_с/image9.png){width="3.829267279090114in"
 height="3.605893482064742in"}
 
 Видим ассемблер, но какой-то сырой, ссылка на умножение заменена
@@ -654,7 +654,7 @@ height="3.605893482064742in"}
 
 Результат:
 
-![](media/image10.png){width="4.238932633420823in"
+![](media_с/image10.png){width="4.238932633420823in"
 height="2.9813812335958003in"}
 
 Здесь видно общее устройство объектного файла. Это не полноценный
@@ -675,7 +675,7 @@ objcopy. Она также позволяет редактировать бин�
 ```
 Результат:
 
-![](media/image11.png){width="4.604166666666667in"
+![](media_с/image11.png){width="4.604166666666667in"
 height="4.645833333333333in"}
 
 Здесь -O Verilog говорит о том, что результат будет удобоваримым для
@@ -693,7 +693,7 @@ readmem, однако по умолчанию данные записаны по
 little-endian, поэтому младший байт идёт в конец строки. Результат
 правильный.
 
-![](media/image12.png){width="3.6458333333333335in" height="5.09375in"}
+![](media_с/image12.png){width="3.6458333333333335in" height="5.09375in"}
 
 **Компиляция под конкретный контроллер**
 
@@ -723,7 +723,7 @@ little-endian, поэтому младший байт идёт в конец с�
 линковку -- размещение функций в нужном порядке и установление связей
 между ними. На выходе получается исполняемый файл, готовый к запуску.
 
-Сначала **напишем линкер.** Структура его такая:
+Сначала напишем линкер. Структура его такая:
 
 ```ld
 OUTPUT_FORMAT("elf32-littleriscv")
@@ -972,7 +972,7 @@ objcopy.
 нулю. Проверить правильность размещения секций данных и bss не
 получится.
 
-![](media/image13.png){width="6.49375in" height="0.8048611111111111in"}
+![](media_с/image13.png){width="6.49375in" height="0.8048611111111111in"}
 
 Смотрим дизасм:
 ```asm
@@ -1325,14 +1325,14 @@ Disassembly of section .text:
 Заходим в моделсим, грузим в проект файлы проца, грузим в папку проца и
 в проект прошивку, запускаем симуляцию.
 
-![](media/image14.png){width="6.496527777777778in"
+![](media_с/image14.png){width="6.496527777777778in"
 height="5.306380139982502in"}
 
 Через некоторое количество попыток видим наши -45 в регистре a5. Победа!
 Остаётся узнать, почему процессор уходит в x-состояние, хотя мы написали
 в стартап-файле бесконечный цикл после main. Смотрим на счётчик команд:
 
-![](media/image15.png){width="6.177152230971129in"
+![](media_с/image15.png){width="6.177152230971129in"
 height="0.718507217847769in"}
 
 Смотрим на дизассемблер:
@@ -1343,12 +1343,12 @@ height="0.718507217847769in"}
 скопировать hex-представление из дизассемблера, вставить в калькулятор,
 перевести в бинарный вид.
 
-![](media/image16.png){width="6.496527777777778in"
+![](media_с/image16.png){width="6.496527777777778in"
 height="2.922732939632546in"}
 
 Далее в любом доступном редакторе бьём инструкцию:
 
-![](media/image17.png){width="4.110787401574803in"
+![](media_с/image17.png){width="4.110787401574803in"
 height="2.18463801399825in"}
 
 Узнаём, что ret является на самом деле инструкцией jalr ra, 0(0). Ищем
@@ -1431,302 +1431,6 @@ Disassembly of section .text:
 
 Результат:
 
-![](media/image18.png){width="6.496527777777778in" height="5.30625in"}
+![](media_с/image18.png){width="6.496527777777778in" height="5.30625in"}
 
-**Тут говина, пока убирать не буду, хотя вряд ли понадобится**
-```bash
-Команды для компиляции и дизассемблирования
 
-anthon@logik MINGW64 /c/riscv_compilation/aps
-
-anthon@logik MINGW64 /c/riscv_compilation/aps
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i_zicsr -mabi=ilp32
--Wl,\--gc-sections -nostartfiles -T linker_script.ld startup.o main.o -o
-result.elf
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-startup.o: in function \`.L0 \':
-
-(.boot+0xb8): undefined reference to \`int_handler\'
-
-collect2.exe: error: ld returned 1 exit status
-
-anthon@logik MINGW64 /c/riscv_compilation/aps
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -c -march=rv32i_zicsr -mabi=ilp32
-startup.S -o startup.o
-
-anthon@logik MINGW64 /c/riscv_compilation/aps
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i_zicsr -mabi=ilp32
--Wl,\--gc-sections -nostartfiles -T linker_script.ld startup.o main.o -o
-result.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/aps
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objcopy -O verilog result.elf init.mem
-
-anthon@logik MINGW64 /c/riscv_compilation/aps
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objcopy -O verilog
-\--verilog-data-width=4 result.elf init.mem
-
-anthon@logik MINGW64 /c/riscv_compilation/aps
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D result.elf \>
-disasmed_result.S
-
-anthon@logik MINGW64 /c/riscv_compilation/aps
-
-\$
-
-(.text+0x0): undefined reference to \`\_\_global_pointer\$\'
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-(.text+0x8): undefined reference to \`\_\_bss_start\'
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-(.text+0x10): undefined reference to \`\_end\'
-
-collect2.exe: error: ld returned 1 exit status
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -T linker.ld starter.S return_ab.o
--o return_ab.elf
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/lib/crt0.o:
-in function \`\_start\':
-
-(.text+0x0): undefined reference to \`\_\_global_pointer\$\'
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-(.text+0x8): undefined reference to \`\_\_bss_start\'
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-(.text+0x10): undefined reference to \`\_end\'
-
-collect2.exe: error: ld returned 1 exit status
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
-starter.S -o starter.o
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -T linker.ld starter.o return_ab.o
--o return_ab.elf
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/lib/crt0.o:
-in function \`\_start\':
-
-(.text+0x0): undefined reference to \`\_\_global_pointer\$\'
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-(.text+0x8): undefined reference to \`\_\_bss_start\'
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-(.text+0x10): undefined reference to \`\_end\'
-
-collect2.exe: error: ld returned 1 exit status
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -T
-linker.ld starter.S return_ab.o -nostartfiles -o return_ab.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab.elf \>
-return_ab_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -
-starter.S -o starter.o
-
-riscv-none-elf-gcc.exe: error: -E or -x required when input is from
-standard input
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
-starter.S -o starter.o
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -T
-linker.ld starter.o return_ab.o -nostartfiles -o return_ab.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab.elf \>
-return_ab_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -T
-linker.ld starter.S return_ab.o -nostartfiles -o return_ab.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab.elf \>
-return_ab_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab.elf \>
-return_ab_disasm.S
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -T
-linker.ld starter.S return_ab.o -nostartfiles -o return_ab.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab.elf \>
-return_ab_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab.o \> objdisasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
-starter.S return_ab.o -nostartfiles -o return_ab_test.elf
-
-riscv-none-elf-gcc.exe: warning: return_ab.o: linker input file unused
-because linking not done
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab_test.elf \>
-return_ab_test_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
-starter.S -o starter.o
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -T
-linker.ld starter.o return_ab.o -o return_ab_test.elf
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/lib/rv32i/ilp32/crt0.o:
-in function \`\_start\':
-
-(.text+0x0): undefined reference to \`\_\_global_pointer\$\'
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-(.text+0x8): undefined reference to \`\_\_bss_start\'
-
-C:/riscv_cc/bin/../lib/gcc/riscv-none-elf/13.2.0/../../../../riscv-none-elf/bin/ld.exe:
-(.text+0x10): undefined reference to \`\_end\'
-
-collect2.exe: error: ld returned 1 exit status
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -T
-linker.ld starter.o return_ab.o -nostartfiles -o return_ab_test.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab_test.elf \>
-return_ab_test_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32
--nostartfiles -T linker.ld starter.o return_ab.o -o return_ab_test.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab_test.elf \>
-return_ab_test_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32
--nostartfiles -T linker.ld starter.o return_ab.o -o return_ab_test.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab_test.elf \>
-return_ab_test_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab.o \>
-return_ab_o_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c
-return_ab.c -o return_ab.o
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab.o \>
-return_ab_o_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32
--nostartfiles -T linker.ld starter.o return_ab.o -o return_ab_test.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab_test.elf \>
-return_ab_test_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32
--nostartfiles -Wl,\--gc-sections -T linker.ld starter.o return_ab.o -o
-return_ab_delete_unused.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab_d.elf \>
-return_ab_test_disasm.S
-
-return_ab_delete_unused.elf return_ab_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab_delete_unused.elf
-\> return_ab_delete_unused_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c -Os
-return_ab.c -o return_ab_cmprs.o
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -c -Os
-starter.S -o starter_cmprs.o
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-gcc -march=rv32i -mabi=ilp32 -nostartfiles -Wl,\--gc-sections -T linker.ld starter_cmprs.o
-return_ab_cmprs.o -o return_ab_cmprs.elf
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-
-\$ /c/riscv_cc/bin/riscv-none-elf-objdump -D return_ab_cmprs.elf \>
-return_ab_cmprs_disasm.S
-
-anthon@logik MINGW64 /c/riscv_compilation/return_ab
-```
