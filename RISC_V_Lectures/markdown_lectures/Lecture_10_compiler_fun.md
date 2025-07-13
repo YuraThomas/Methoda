@@ -48,7 +48,6 @@ int main() {
 Команда:
 
 ```bash
-
 \$ /c/riscv_cc/bin/riscv-none-elf-g++ -S -march=rv32i_zicsr -mabi=ilp32 main.cpp -o main.s
 ```
 
