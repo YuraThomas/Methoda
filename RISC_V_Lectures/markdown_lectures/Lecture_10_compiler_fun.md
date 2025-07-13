@@ -30,15 +30,10 @@ rv32i_zicsr. I -- это обязательные команды; zicsr -- ка�
 ```cpp
 
 int main() {
-
-int a = -15;
-
-int b = 3;
-
-int c = a\*b;
-
-return 0;
-
+  int a = -15;
+  int b = 3;
+  int c = a\*b;
+  return 0;
 }
 ```
 
@@ -50,7 +45,6 @@ anthon@logik MINGW64 /c/riscv_compilation/TEST
 
 \$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=rv32i_zicsr -mabi=ilp32
 main.cpp -o main.s
-
 ```
 
 Результат -- нечитаемая бяка, visual studio вовсе отказывается открывать
@@ -58,16 +52,16 @@ main.cpp -o main.s
 
 Команда:
 
-\`\`\`bash
+```bash
 
 \$ /c/riscv_cc/bin/riscv-none-elf-g++ -S -march=rv32i_zicsr -mabi=ilp32
 main.cpp -o main.s
 
-\`\`\`
+```
 
 Обратите внимание: добавилась опция "-S". Результат вполне читаем:
 
-\`\`\`asm
+```asm
 
 .file \"main.cpp\"
 
@@ -157,7 +151,7 @@ jr ra
 
 .ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
 
-\`\`\`
+```
 
 Сделаем вывод о том, что S говорит компилятору сделать ассемблер для
 чтения. С тем, что было создано раньше, разберёмся позже.
