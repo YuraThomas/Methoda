@@ -27,7 +27,7 @@ rv32i_zicsr. I -- это обязательные команды; zicsr -- ка�
 Графического интерфейса нет, запускаем командную строку. Пусть мы хотим
 перемножать -3 и 15. Программа:
 
-\`\`\`cpp
+```cpp
 
 int main() {
 
@@ -40,19 +40,18 @@ int c = a\*b;
 return 0;
 
 }
-
-\`\`\`
+```
 
 Команда:
 
-\`\`\`bash
+```bash
 
 anthon@logik MINGW64 /c/riscv_compilation/TEST
 
 \$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=rv32i_zicsr -mabi=ilp32
 main.cpp -o main.s
 
-\`\`\`
+```
 
 Результат -- нечитаемая бяка, visual studio вовсе отказывается открывать
 файл.
