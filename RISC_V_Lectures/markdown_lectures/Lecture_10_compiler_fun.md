@@ -43,8 +43,7 @@ int main() {
 
 anthon@logik MINGW64 /c/riscv_compilation/TEST
 
-\$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=rv32i_zicsr -mabi=ilp32
-main.cpp -o main.s
+\$ /c/riscv_cc/bin/riscv-none-elf-g++ -march=rv32i_zicsr -mabi=ilp32 main.cpp -o main.s
 ```
 
 Результат -- нечитаемая бяка, visual studio вовсе отказывается открывать
@@ -244,151 +243,86 @@ int main() {
 
 
 Команда та же, что раньше, без оптимизаций. Результат:
-
-.file \"main.cpp\"
-
-.option nopic
-
-.attribute arch, \"rv32i2p1_zicsr2p0\"
-
-.attribute unaligned_access, 0
-
-.attribute stack_align, 16
-
-.text
-
-.globl \_\_mulsi3
-
-.align 2
-
-.globl main
-
-.type main, \@function
-
+```asm
+		.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv32i2p1_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+	.text
+	.globl	__mulsi3
+	.align	2
+	.globl	main
+	.type	main, @function
 main:
-
 .LFB0:
-
-.cfi_startproc
-
-addi sp,sp,-32
-
-.cfi_def_cfa_offset 32
-
-sw ra,28(sp)
-
-sw s0,24(sp)
-
-.cfi_offset 1, -4
-
-.cfi_offset 8, -8
-
-addi s0,sp,32
-
-.cfi_def_cfa 8, 0
-
-li a5,-15
-
-sw a5,-20(s0)
-
-li a5,3
-
-sw a5,-24(s0)
-
-lw a1,-24(s0)
-
-lw a0,-20(s0)
-
-call \_\_mulsi3
-
-mv a5,a0
-
-mv a0,a5
-
-lw ra,28(sp)
-
-.cfi_restore 1
-
-lw s0,24(sp)
-
-.cfi_restore 8
-
-.cfi_def_cfa 2, 32
-
-addi sp,sp,32
-
-.cfi_def_cfa_offset 0
-
-jr ra
-
-.cfi_endproc
-
+	.cfi_startproc
+	addi	sp,sp,-32
+	.cfi_def_cfa_offset 32
+	sw	ra,28(sp)
+	sw	s0,24(sp)
+	.cfi_offset 1, -4
+	.cfi_offset 8, -8
+	addi	s0,sp,32
+	.cfi_def_cfa 8, 0
+	li	a5,-15
+	sw	a5,-20(s0)
+	li	a5,3
+	sw	a5,-24(s0)
+	lw	a1,-24(s0)
+	lw	a0,-20(s0)
+	call	__mulsi3
+	mv	a5,a0
+	mv	a0,a5
+	lw	ra,28(sp)
+	.cfi_restore 1
+	lw	s0,24(sp)
+	.cfi_restore 8
+	.cfi_def_cfa 2, 32
+	addi	sp,sp,32
+	.cfi_def_cfa_offset 0
+	jr	ra
+	.cfi_endproc
 .LFE0:
-
-.size main, .-main
-
-.ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
+	.size	main, .-main
+	.ident	"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0"
+```
 
 В целом, то же самое. Вводим оптимизацию (1):
-
-.file \"main.cpp\"
-
-.option nopic
-
-.attribute arch, \"rv32i2p1_zicsr2p0\"
-
-.attribute unaligned_access, 0
-
-.attribute stack_align, 16
-
-.text
-
-.align 2
-
-.globl main
-
-.type main, \@function
-
+```asm
+	.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv32i2p1_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+	.text
+	.align	2
+	.globl	main
+	.type	main, @function
 main:
-
 .LFB0:
-
-.cfi_startproc
-
-li a0,-45
-
-ret
-
-.cfi_endproc
-
+	.cfi_startproc
+	li	a0,-45
+	ret
+	.cfi_endproc
 .LFE0:
+	.size	main, .-main
+	.ident	"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0"
+ ```
 
-.size main, .-main
+Считает a*b не совсем функция, а скорее компилятор. Ну что ж, мы просили для конкретных чисел, попробуем для входных значений a и b.
 
-.ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
-
-Считает a\*b не совсем функция, а скорее компилятор. Ну что ж, мы
-просили для конкретных чисел, попробуем для входных значений a и b.
-
-\`\`\`cpp
-
+```cpp
 int mul(int a, int b) {
-
-return a \* b;
-
+  return a * b;
 }
 
 int main() {
-
-int a = -15;
-
-int b = 3;
-
-mul(a, b);
-
+	int a = -15;
+	int b = 3;
+	mul(a, b);
 }
 
-\`\`\`
 
 Результат:
 
