@@ -173,92 +173,60 @@ main:
 
 
 Команда с оптимизацией уровня 1:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-g++ -S -O1 -march=rv32i_zicsr
--mabi=ilp32 main.cpp -o main.s
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-g++ -S -O1 -march=rv32i_zicsr -mabi=ilp32 main.cpp -o main.s
+```
 
 Результат:
-
-.file \"main.cpp\"
-
-.option nopic
-
-.attribute arch, \"rv32i2p1_zicsr2p0\"
-
-.attribute unaligned_access, 0
-
-.attribute stack_align, 16
-
-.text
-
-.align 2
-
-.globl main
-
-.type main, \@function
-
+```asm
+	.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv32i2p1_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+	.text
+	.align	2
+	.globl	main
+	.type	main, @function
 main:
-
 .LFB0:
-
-.cfi_startproc
-
-li a0,0
-
-ret
-
-.cfi_endproc
-
+	.cfi_startproc
+	li	a0,0
+	ret
+	.cfi_endproc
 .LFE0:
-
-.size main, .-main
-
-.ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
+	.size	main, .-main
+	.ident	"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0"
+```
 
 Команда для оптимизации уровня 2:
-
-\$ /c/riscv_cc/bin/riscv-none-elf-g++ -S -O2 -march=rv32i_zicsr
--mabi=ilp32 main.cpp -o main.s
+```bash
+\$ /c/riscv_cc/bin/riscv-none-elf-g++ -S -O2 -march=rv32i_zicsr -mabi=ilp32 main.cpp -o main.s
+```
 
 Результат:
-
-.file \"main.cpp\"
-
-.option nopic
-
-.attribute arch, \"rv32i2p1_zicsr2p0\"
-
-.attribute unaligned_access, 0
-
-.attribute stack_align, 16
-
-.text
-
-.section .text.startup,\"ax\",@progbits
-
-.align 2
-
-.globl main
-
-.type main, \@function
-
+```asm
+Результат:
+	.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv32i2p1_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+	.text
+	.section	.text.startup,"ax",@progbits
+	.align	2
+	.globl	main
+	.type	main, @function
 main:
-
 .LFB0:
-
-.cfi_startproc
-
-li a0,0
-
-ret
-
-.cfi_endproc
-
+	.cfi_startproc
+	li	a0,0
+	ret
+	.cfi_endproc
 .LFE0:
-
-.size main, .-main
-
-.ident \"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0\"
+	.size	main, .-main
+	.ident	"GCC: (xPack GNU RISC-V Embedded GCC x86_64) 13.2.0"
+```
 
 Как видим, оптимизация неиспользуемый результат умножения устраняет
 сразу же, т.к. функция возвращает 0. Однако, без оптимизации внешняя
@@ -266,19 +234,14 @@ ret
 
 Засунем результат в вывод функции.
 
-\`\`\`cpp
-
+```cpp
 int main() {
-
-int a = -15;
-
-int b = 3;
-
-return a\*b;
-
+	int a = -15;
+	int b = 3;
+	return a*b;
 }
+```
 
-\`\`\`
 
 Команда та же, что раньше, без оптимизаций. Результат:
 
