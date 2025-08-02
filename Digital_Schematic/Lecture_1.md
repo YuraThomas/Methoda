@@ -57,7 +57,7 @@ $I = \frac{k}{2} \cdot \left( U_{GS} - U_{G0} \right)^{2}$ - когда тран
 Предположим, что у нас нижний транзистор находится в пологом режиме.
 Тогда:
 
-$I = k_{1} \cdot \frac{\left( U_{in} - U_{G0} )\right)^{2}}{2} =  k_{2} \cdot \frac{\left( Vdd - U_{out} - U_{G0} )\right)^{2}}{2}$
+$I = k_{1} \cdot \frac{\left( U_{in} - U_{G0} \right)^{2}}{2} =  k_{2} \cdot \frac{\left( Vdd - U_{out} - U_{G0} \right)^{2}}{2}$
 
 $U_{out} = Vdd - \sqrt{\frac{k_{1}}{k_{2}}} \cdot U_{in} + U_{G0} \cdot \left( \sqrt{\frac{k_{1}}{k_{2}}} - 1 \right)$
 
