@@ -12,11 +12,11 @@ $I = 0,\ U_{GS} < U_{G0}$ — аналог контактной разности
 
 $I = \mu_{n} \cdot C_{ox} \cdot \frac{W}{L} \left( (U_{GS} - U_{G0}) \cdot U_{DS} - \frac{U_{DS}^2}{2} \right)$
 
-$I = \mu_{n} \cdot C_{ox} \cdot \frac{W}{2L} \left( U_{GS} - U_{G0})^{2}$ - когда транзистор в пологом режиме  (см картинку)
+$I = \mu_{n} \cdot C_{ox} \cdot \frac{W}{2L} \left( U_{GS} - U_{G0} \right)^2$  
 
 Весьма часто происходит замена
 
-$$\mu_{n}*C_{ox}*\frac{w}{l} = k - исключительно\ ради\ удобства$$
+$ \mu_{n} \cdot C_{ox} \cdot \frac{w}{l} = k $ - исключительно ради удобства
 
 $$I = \ k*\left( \left( U_{GS} - U_{G0} \right)*U_{DS} - \frac{U_{DS}^{2}}{2} \right) - когда\ транзистор\ в\ крутом\ режиме\ $$
 
