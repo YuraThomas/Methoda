@@ -41,7 +41,7 @@ $I = \frac{k}{2} \cdot \left( U_{GS} - U_{G0} \right)^{2}$ - когда тран
 
 ![](images_methoda/media/image5.png)
 
-Диаграмма, показывающая, что эта схема может быть инвертором( "1" в "0"
+Диаграмма, показывающая, что эта схема может быть инвертором( ```1``` в ```0```
 и наоборот):
 
 ![](images_methoda/media/image6.png)
@@ -57,9 +57,9 @@ $I = \frac{k}{2} \cdot \left( U_{GS} - U_{G0} \right)^{2}$ - когда тран
 Предположим, что у нас нижний транзистор находится в пологом режиме.
 Тогда:
 
-$$I = \ k_{1}*\frac{\left( U_{in} - U_{G0} \right)^{2}}{2} = \ k_{2}*\frac{\left( {Vdd - U}_{out} - U_{G0} \right)^{2}}{2}$$
+$I = \ k_{1} \cdot \frac{\left( U_{in} - U_{G0} \right)^{2}}{2} = \ k_{2} \cdot \frac{\left( {Vdd - U}_{out} - U_{G0} \right)^{2}}{2}$
 
-$$U_{out} = Vdd - \sqrt{\frac{k_{1}}{k_{2}}}*U_{in} + \ \ U_{G0}*\left( \sqrt{\frac{k_{1}}{k_{2}}} - 1 \right)$$
+$U_{out} = Vdd - \sqrt{\frac{k_{1}}{k_{2}}} \cdot U_{in} + U_{G0} \cdot \left( \sqrt{\frac{k_{1}}{k_{2}}} - 1 \right)$
 
 Заметим, что данная схема работает как очень хороший (линейный)
 усилитель, ТК на данном диапазоне
