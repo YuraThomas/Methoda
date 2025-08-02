@@ -16,7 +16,7 @@ $I = \mu_{n} \cdot C_{ox} \cdot \frac{W}{2L} \left( U_{GS} - U_{G0} \right)^2$
 
 Весьма часто происходит замена
 
-$\mu_{n} \cdot C_{ox} \cdot \frac{w}{l} = k$ - исключительно ради удобства
+$k = \mu_{n} \cdot C_{ox} \cdot \frac{w}{l}$ - исключительно ради удобства
 
 $$I = \ k*\left( \left( U_{GS} - U_{G0} \right)*U_{DS} - \frac{U_{DS}^{2}}{2} \right) - когда\ транзистор\ в\ крутом\ режиме\ $$
 
@@ -24,38 +24,32 @@ $$I = \frac{k}{2}*\left( U_{GS} - U_{G0} \right)^{2} - когда\ транзи�
 
 Обозначение транзисторов (данные обозначения считаются цифровыми):
 
-![](images_methoda/media/image2.png){width="2.734847987751531in"
-height="1.4066262029746281in"}
+![](images_methoda/media/image2.png)
 
 Аналоговые обозначения:
 
-![](images_methoda/media/image3.png){width="1.7651509186351706in"
-height="1.4121194225721785in"}
+![](images_methoda/media/image3.png)
 
 На подложку внимания сейчас на обращаем.
 
 Итак, у нас имеется схема и экспериментальные (ну ладно, с САПРа)
 данные:
 
-![](images_methoda/media/image4.png){width="2.9015146544181976in"
-height="2.5494291338582675in"}
+![](images_methoda/media/image4.png)
 
 Зависимость выходного напряжения от входного:
 
-![](images_methoda/media/image5.png){width="5.954545056867891in"
-height="2.2331135170603673in"}
+![](images_methoda/media/image5.png)
 
 Диаграмма, показывающая, что эта схема может быть инвертором( "1" в "0"
 и наоборот):
 
-![](images_methoda/media/image6.png){width="5.9848479877515315in"
-height="2.122767935258093in"}
+![](images_methoda/media/image6.png)
 
 Итак, получим аналитическое выражение зависимости напряжения на выходе
 от напряжения на входе.
 
-![](images_methoda/media/image7.png){width="4.537878390201225in"
-height="3.9872244094488187in"}
+![](images_methoda/media/image7.png)
 
 Для начала скажем, что напряжение на входе у нас больше порогового
 (которое порядка 0,5 В)
