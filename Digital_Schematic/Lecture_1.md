@@ -18,7 +18,7 @@ $I = \mu_{n} \cdot C_{ox} \cdot \frac{W}{2L} \left( U_{GS} - U_{G0} \right)^2$
 
 $k = \mu_{n} \cdot C_{ox} \cdot \frac{w}{l}$ - исключительно ради удобства
 
-$$I = \ k*\left( \left( U_{GS} - U_{G0} \right)*U_{DS} - \frac{U_{DS}^{2}}{2} \right) - когда\ транзистор\ в\ крутом\ режиме\ $$
+$I =k \cdot \left( (U_{GS} - U_{G0}) \cdot U_{DS} - \frac{U_{DS}^2}{2} \right)$ - когда транзистор в крутом режиме
 
 $$I = \frac{k}{2}*\left( U_{GS} - U_{G0} \right)^{2} - когда\ транзистор\ в\ пологом\ режиме$$
 
