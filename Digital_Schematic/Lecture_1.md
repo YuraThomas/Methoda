@@ -81,7 +81,7 @@ $K = \frac{dU_{out}}{{dU}_{in}} = - \sqrt{\frac{k_{упр}}{k_{диод}}} = \ \
 
 $U_{out} = Vdd - \sqrt{\frac{k_{1}}{k_{2}}} \cdot U_{in\_ max} + U_{G0} \cdot \left( \sqrt{\frac{k_{1}}{k_{2}}} - 1 \right) = U_{in\_ max} - U_{G0}$
 
-$U_{in\_ max} = \frac{Vdd}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} + \frac{\sqrt{\frac{k_{1}}{k_{2}}}}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} \cdot U_{G0} = \frac{5}{11} + \frac{10}{11} \cdot 0.5 = 0.9 В$
+$U_{in max} = \frac{Vdd}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} + \frac{\sqrt{\frac{k_{1}}{k_{2}}}}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} \cdot U_{G0} = \frac{5}{11} + \frac{10}{11} \cdot 0.5 = 0.9 В$
 
 ТЕ при большом коэффициенте усиления и идеальной линейности получаем
 весьма малый динамический диапазон.
@@ -89,16 +89,16 @@ $U_{in\_ max} = \frac{Vdd}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} + \frac{\sqrt{\frac{k
 Давайте свяжем максимальное входное линейное напряжение и коэффициент
 усиления:
 
-$U_{in\_ max} = \frac{Vdd}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} + \frac{\sqrt{\frac{k_{1}}{k_{2}}}}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} \cdot U_{G0} = \frac{Vdd}{K + 1} + \frac{1}{1 + \frac{1}{K}} \cdot U_{G0}$
+$U_{in max} = \frac{Vdd}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} + \frac{\sqrt{\frac{k_{1}}{k_{2}}}}{\sqrt{\frac{k_{1}}{k_{2}}} + 1} \cdot U_{G0} = \frac{Vdd}{K + 1} + \frac{1}{1 + \frac{1}{K}} \cdot U_{G0}$
 
 При довольно большом K (раз так в 5 больше 1)
 
-$U_{in\_max}  \approx  \frac{Vdd}{K} + U_{G0}$
+$U_{in max}  \approx  \frac{Vdd}{K} + U_{G0}$
 
 Таким образом получаем типичное для реальности соотношение между
 коэффициентом усиления и максимальной амплитудой сигнала = A:
 
-$U_{in\_max} - U_{G0} = 2A = \frac{Vdd}{K}$
+$U_{in max} - U_{G0} = 2A = \frac{Vdd}{K}$
 
 $A*K = \frac{Vdd}{2}$
 
