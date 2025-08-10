@@ -16,8 +16,8 @@ master-slave, проверки передачи данных master-slave и т�
 **```UART```**.
 
 Из плюсов: имеется 1-2 характерных бита проверки передачи данных,
-довольно быстрый (но помедленнее SPI, скорость передачи порядка 1
-Мбит/с), простой в построении (сложность примерно SPI). Может
+довольно быстрый (но помедленнее ```SPI```, скорость передачи порядка 1
+Мбит/с), простой в построении (сложность примерно ```SPI```). Может
 одновременно передавать и получать данные
 
 Из минусов: только для связи 2 устройств между собой (и при построении
@@ -33,7 +33,7 @@ master-slave, проверки передачи данных master-slave и т�
 
 Из минусов: скорость передачи куда ниже, чем в SPI и UART (порядка 0.1
 Мбит/с), довольно неприятно делать и отлаживать (хотя бы из-за того, что
-sda -- inout). Также, из-за использования z-state весьма сильно
+sda - ```inout```). Также, из-за использования z-state весьма сильно
 чувствителен к помехам (несколько нивелируется на практике подтягивающим
 резистором, но не полностью)
 
@@ -45,11 +45,11 @@ sda -- inout). Также, из-за использования z-state весь
 
 ### Про алгоритм передачи данных в I2C.
 
-Для начала передачи/приема данных существует условие START
+Для начала передачи/приема данных существует условие ```START```
 
-Для конца передачи/приема данных существует условие STOP
+Для конца передачи/приема данных существует условие ```STOP```
 
-**Условия START и STOP**
+**Условия ```START``` и ```STOP```**
 
 ![](media/image1.png)
 
@@ -90,7 +90,7 @@ sda -- inout). Также, из-за использования z-state весь
 Возможны случаи, когда этого бита нет, но конкретно в нашей реализации
 он будет.
 
-Затем этого master ждет подтверждение приема данных от slave ("0" --
+Затем этого master ждет подтверждение приема данных от slave ("0" -
 данные принял, иначе ставит "1").
 
 Что же будет подтягивать I2C линию в "1", если, вдруг, slave отключился
@@ -112,11 +112,11 @@ Slave отправляет 8 бит данных и ждет подтвержд�
 он есть, то продолжает передачу данных, иначе переходит в z-state (на
 линии pull-up выставляет "1")
 
-**Условие START (конкретно на нашей симуляции)**
+**Условие ```START``` (конкретно на нашей симуляции)**
 
 ![](media/image6.png)
 
-**Условие STOP/END (конкретно на нашей симуляции)**
+**Условие ```STOP/END``` (конкретно на нашей симуляции)**
 
 ![](media/image7.png)
 
@@ -162,8 +162,8 @@ I2C-Master.
 
 ```A_slave``` - в процессе тестирования I2C-Master я вынес подтверждение
 от Slave в данный провод (в итоговой версии его нет). Сделал же я это
-из-за неудобства тестирования и отладки порта типа inout (которым, в
-итоге будет sda).
+из-за неудобства тестирования и отладки порта типа ```inout``` (которым, в
+итоге будет ```sda```).
 
 ```Slave_addr_i``` -  8-битный адрес slave, задает внешний источник
 (условно, компьютер)
@@ -212,21 +212,324 @@ Master имеет смысл привести пример работы данн
 
 ![](media/image13.png)
 
-Состояния те же самые, просто вместо перехода к END Master возвращается
+Состояния те же самые, просто вместо перехода к ```END``` Master возвращается
 к состоянию приема данных от SLAVE.
 
-Также, так-как код Master у автора занимает порядка 300 (а с учетом
-модулей и 400+) строчек кода, то продемонстрирую я только описание на
-System Verilog FSM мастера.
+<details>
+<summary>Описание Master-I2C на System Verilog</summary>
 
-**Описание на System Verilog FSM-master.**
+```systemverilog
+module my_i2c_tr(	
+	input  [7:0]  data_master,
+	input  [7:0]  slave_addr_i,
+	input  [7:0]  memory_slave_addr,
+	
+	input         start,
+	input         select_rezim,
+	input         clk,
+	input         rst,
+	input         end_otpravka, // Если 1, то конец, иначе продолжать обмен данными
+	
+	inout         sda,
+	output        scl_o,
+	//input         A_slave,
+	
+	output [31:0] state_o, //state_fsm для отладки
+	
+	output [7:0]  addr_from_slave,
+	output [7:0]  data_from_slave,
+	
+	output        vld_addr_data,
+	output        vld_data,
+	output [7:0]  count_data_to_slave_o
+);
 
-![](media/image14.png)
+logic A_slave;
+assign A_slave = sda;
+assign state_o = state;
 
-**Нумерация состояний (через ```localparam```, так-как через ```enum``` коробочки
-желтой не было)**
+assign count_data_to_slave_o = count_data_to_slave;
 
-![](media/image15.png)
+logic [7:0] num_data_pack;
+logic scl;
+logic end_wait;
+
+
+assign scl_o = scl;
+
+
+logic [8:0] slave_addr;
+assign slave_addr = {select_rezim, slave_addr_i};
+
+
+localparam
+	START_STATE_FSM = 4'd12,
+	INITIAL_STATE_FSM = 4'd0,
+	SLAVE_ADDR_FSM = 4'd1,
+	WAIT_SLAVE_ADDR_FSM = 4'd2,
+	ADDR_MEM_FSM = 4'd3,
+	WAIT_ADDR_MEM_FSM = 4'd4,
+	TR_DATA_FSM = 4'd5,
+	WAIT_END_STATE_FSM = 4'd6,
+	END_STATE_FSM = 4'd7,
+	
+	INPUT_ADDR_DATA_FSM = 4'd8,
+	WAIT_ADDR_DATA_FSM = 4'd9,
+	INPUT_DATA_FSM = 4'd10,
+	WAIT_END_DATA_IN_FSM = 4'd11;
+	
+logic [3:0] state;
+logic [3:0] next_state;
+
+
+always @(*) begin
+	next_state = state;
+	case(state)
+		INITIAL_STATE_FSM : begin
+			if (start) next_state = START_STATE_FSM;
+		end
+		
+		START_STATE_FSM : begin
+			if (end_start) next_state = SLAVE_ADDR_FSM;
+		end
+		
+		SLAVE_ADDR_FSM : begin
+			if (end_slave_count) next_state = WAIT_SLAVE_ADDR_FSM;
+		end
+		
+		WAIT_SLAVE_ADDR_FSM : begin
+			if (~A_slave && end_wait) begin
+				next_state = (~select_rezim) ? ADDR_MEM_FSM : INPUT_ADDR_DATA_FSM;
+			end
+		end
+		
+		
+		INPUT_ADDR_DATA_FSM : if (end_addr_mem_slave) next_state = WAIT_ADDR_DATA_FSM;
+		
+		WAIT_ADDR_DATA_FSM : if (end_wait) next_state = INPUT_DATA_FSM;
+		
+		INPUT_DATA_FSM : next_state = (end_data_to_slave) ? WAIT_END_DATA_IN_FSM : INPUT_DATA_FSM;
+		
+		WAIT_END_DATA_IN_FSM : begin
+			if(end_wait) begin
+				if(~A_slave && ~end_otpravka) next_state = INPUT_DATA_FSM;
+				else next_state = END_STATE_FSM;
+			end
+		end
+		
+		
+		ADDR_MEM_FSM : begin
+			if (end_addr_mem_slave) next_state = WAIT_ADDR_MEM_FSM;
+		end
+		
+		WAIT_ADDR_MEM_FSM : begin
+			if (end_wait) begin
+				if  (~A_slave) next_state = TR_DATA_FSM;
+				else next_state = INITIAL_STATE_FSM;
+			end
+		
+		end
+		
+		TR_DATA_FSM : begin
+			if (end_data_to_slave && end_otpravka) next_state = WAIT_END_STATE_FSM;
+		end
+		
+		WAIT_END_STATE_FSM : begin
+			if(end_wait) begin
+				if(~A_slave && ~end_otpravka) next_state = TR_DATA_FSM;
+				else next_state = END_STATE_FSM;
+			end
+		end
+		
+		
+		END_STATE_FSM : begin
+			if(end_start) next_state = INITIAL_STATE_FSM;
+		end
+	endcase
+end
+
+logic [3:0] num_slave_addr;
+logic [3:0] num_slave_mem_addr;
+logic sda_neg_clk;
+
+logic vivod;
+logic end_start;
+
+always @(posedge clk) begin
+	sda<=1'dz;
+	case (state)
+	
+		INITIAL_STATE_FSM : begin
+			sda <= 1'dz;
+		end
+		
+		START_STATE_FSM : begin
+		if (detect_pos_scl) sda <= 1'd0;
+		else sda <= 1'd1;
+		
+			
+	   end
+	  
+		SLAVE_ADDR_FSM : begin
+			if (count_slave_addr < 9) begin
+				sda <= slave_addr[count_slave_addr];
+			end
+		end
+	
+
+		ADDR_MEM_FSM : begin
+			if (count_memory_slave_addr < 8) begin
+				sda <= memory_slave_addr[count_memory_slave_addr];
+			end
+			
+			else sda <= 1'dz;
+		end
+	
+
+		TR_DATA_FSM : begin
+			if (count_data_to_slave < 8) begin
+				sda <= data_master[count_data_to_slave];
+			end 
+
+			else sda <= 1'dz;
+		end
+
+	
+		END_STATE_FSM : begin
+			if (num_end < 2) begin
+				if (detect_pos_scl) sda <= 1'd1;
+				else sda <= 1'd0;
+			end
+				
+		end
+	
+		INPUT_ADDR_DATA_FSM : sda <= 1'dz;
+		
+		WAIT_ADDR_DATA_FSM : sda <= 1'd0;
+		
+		INPUT_DATA_FSM : sda <= 1'dz;
+		
+		WAIT_END_DATA_IN_FSM : sda <= end_otpravka;
+	
+	endcase
+	
+	
+end
+
+
+
+always @(posedge clk) begin
+	if (rst) state = INITIAL_STATE_FSM;
+	else state <= next_state;
+end
+
+
+logic end_slave_count;
+logic end_addr_mem_slave;
+logic end_data_to_slave;
+logic end_count_exit;
+
+logic [4:0] count_memory_slave_addr;
+logic [4:0] count_slave_addr;
+logic [4:0] count_data_to_slave;
+logic [4:0] num_end;
+
+counter slave_addr_counter(
+	.rst(rst),
+	.enable((state == SLAVE_ADDR_FSM)),
+	.end_count(5'd9),
+	.clk(scl),
+	.out_cnt(end_slave_count),
+	.num (count_slave_addr)
+);
+
+counter WAIT_counter(
+	.rst(rst),
+	.enable(((state == WAIT_ADDR_DATA_FSM) || (state == WAIT_END_STATE_FSM) || 
+	        (state == WAIT_SLAVE_ADDR_FSM) || (state == WAIT_ADDR_MEM_FSM)) ||
+			  (state == WAIT_END_DATA_IN_FSM)),
+	.end_count(5'd1),
+	.clk(scl),
+	.out_cnt(end_wait),
+	.num ()
+);
+
+counter memory_addr_counter(
+	.rst(rst),
+	.enable(((state == ADDR_MEM_FSM) || (state == INPUT_ADDR_DATA_FSM))),
+	.end_count(5'd8),
+	.clk(scl),
+	.out_cnt(end_addr_mem_slave),
+	.num (count_memory_slave_addr)
+);
+
+counter data_counter(
+	.rst(rst),
+	.enable(((state == TR_DATA_FSM) || (state == INPUT_DATA_FSM))),
+	.end_count(5'd8),
+	.clk(scl),
+	.out_cnt(end_data_to_slave),
+	.num(count_data_to_slave)
+);
+
+counter end_counter(
+	.rst(rst),
+	.enable( (state == END_STATE_FSM)),
+	.end_count(5'd2),
+	.clk(scl),
+	.out_cnt(end_count_exit),
+	.num(num_end)
+);
+
+from_1_to_8 data_addr_mem (
+	.data_i(sda),
+	.clk(scl),
+	.enable((state == INPUT_ADDR_DATA_FSM)),
+	.rst(rst),
+	.vld(vld_addr_data),
+	.data_o(addr_from_slave)
+);
+
+from_1_to_8 data (
+	.data_i(sda),
+	.clk(scl),
+	.enable((state == INPUT_DATA_FSM)),
+	.rst(rst),
+	.vld(vld_data),
+	.data_o(data_from_slave)
+);
+
+devider_CLK generate_SCL (
+	.clk(clk),
+	.SCL(scl)
+);
+
+start_end_sda nachalo_conec (
+	.clk(clk),
+   .scl(scl),
+	.enable((state == END_STATE_FSM) || (state == START_STATE_FSM)),
+	.sda(),
+	.vivod(vivod),
+	.end_clk(end_start)
+	
+);
+
+logic detect_pos_scl;
+logic detect_neg_scl;
+
+detect_pos_neg_scl for_start_end(
+	.clk(clk),
+	.scl(scl),
+	.enable((state == END_STATE_FSM || state == START_STATE_FSM || state == WAIT_SLAVE_ADDR_FSM) ),
+	.rst(rst),
+	.detect_pos_scl (detect_pos_scl),
+	.detect_neg_scl (detect_neg_scl)
+);
+endmodule
+```
+
+</details>
+
 
 **RTL Viewer I2C-Master**
 
@@ -236,23 +539,62 @@ System Verilog FSM мастера.
 
 ![](media/image17.png)
 
-**Немного про модули (синие коробочки) I2C-Master.**
+### Немного про модули (синие коробочки) I2C-Master.
 
-**Модуль 1. From 1_to_8**
+**Модуль 1. ```from 1_to_8```**
 
 ![](media/image18.png)
 
-Реализован мною он был для того, чтобы данные с **SDA** переводить в
-8-битную шину и после передачи данных ставить сигнал **vld**.
+Реализован мною он был для того, чтобы данные с ```SDA``` переводить в
+8-битную шину и после передачи данных ставить сигнал ```vld```.
 Использован же он несколько избыточно как в Master, так и в Slave,
 так-как можно обойтись одним таким модулем, если чуток потанцевать с
 бубном.
 
-**Описание на System Verilog.**
+<details>
+<summary>Описание на System Verilog</summary>
 
-![](media/image19.png){
+```systemverilog
+module from_1_to_8
+#(parameter NUM = 8) (
+	input data_i,
+	input clk,
+	input enable,
+	input rst,
+	output vld,
+	output [NUM - 1:0] data_o
+);
 
-**Модуль 2. Counter.**
+localparam count_razr = $clog2(NUM);
+
+logic [NUM - 1 :0] data = '0;
+assign data_o = data ;
+logic vld_mem;
+
+always_ff @(posedge clk) begin
+	vld <= vld_mem;
+	if (rst || ~enable) data <= '0;
+	else begin 
+		data <= {data [NUM - 2 :0], data_i};
+	end
+end
+
+counter counter_for_num(
+	.rst(rst),
+	.enable(enable),
+	.end_count(NUM-1),
+	.clk(clk),
+	.out_cnt(vld_mem),
+	.num()
+);
+
+
+endmodule
+```
+
+</details>
+
+**Модуль 2. ```counter```.**
 
 Сделан был мной ради того, чтобы считать до 8 (передача адреса данных и
 передача данных), до 9 (передача адреса slave + 1 бит выбора режима), до
@@ -266,9 +608,40 @@ System Verilog FSM мастера.
 оптимизация может нормально не оптимизировать) и, по желанию,
 параметризовать его.
 
-**Описание на System Verilog.**
+<details>
+<summary>Описание на System Verilog</summary>
 
-![](media/image21.png)
+```systemverilog
+module counter (
+	input rst,
+	input enable,
+	input [4:0] end_count,
+	input clk,
+	output out_cnt,
+	output [4:0] num
+);
+
+logic [4:0] counter;
+
+always @(negedge clk) begin
+	if (rst || ~enable) counter <= '0;
+	
+	else begin
+		if (counter == end_count) counter <= '0;
+		else counter <= counter + 1;
+	end
+
+
+end
+
+assign out_cnt = (counter == end_count);
+assign num = counter;
+endmodule
+	
+```
+
+</details>
+
 
 **Модуль 3. Devider_CLK.**
 
@@ -280,15 +653,90 @@ System Verilog FSM мастера.
 
 **Описание на System Verilog.**
 
-![](media/image23.png)
+<details>
+<summary>Описание на System Verilog</summary>
 
-**Модуль 4. Start_end_SDA.**
+```systemverilog
+module devider_CLK (
+	input clk,
+	output SCL
+);
+
+reg [8:0] num;
+
+always_ff @(posedge clk) begin
+	if (num[8]) num <= '0;
+	else num <= num + 1;
+end
+
+assign SCL = num[4];
+endmodule
+```
+
+</details>
+
+**Модуль 4. ```Start_end_SDA```.**
 
 ![](media/image24.png)
 
 Данный модуль является частично костылем, который можно поменять (потому
 как он частично повторяет функционал модуля 5), изначально создавался
 для выравнивания ```SDA``` и ```SCL``` между передачей данных и ```START/END```.
+
+<details>
+<summary> Описание на System Verilog </summary>
+
+```systenverilog
+module start_end_sda (
+	input clk,
+	input scl,
+	input enable,
+	output sda,
+	input vivod,
+	output end_clk
+	
+);
+
+logic start_nya;
+logic end_nya;
+logic end_start;
+
+assign end_clk = end_start;
+
+always @(posedge clk) begin 
+	if(enable) begin 
+			if (~scl) begin
+					start_nya <= 1'd1;
+					if (end_nya) begin 
+						end_start <= 1'd1;
+					end
+			end
+			
+			if (end_nya) begin 
+					sda <= vivod;
+			end
+			
+			else sda <= 1'dz;
+			
+			if (scl) begin
+					if(start_nya) begin
+						start_nya <= 1'd0;
+						end_nya <= 1'd1;
+					end			
+			end
+	end
+	
+	else begin
+			start_nya <= 1'd0;
+			end_nya <= 1'd0;
+			end_start <= 1'd0;
+	
+	end
+end
+endmodule
+```
+
+</details>
 
 **Модуль 5. Detect_pos_neg_scl.**
 
