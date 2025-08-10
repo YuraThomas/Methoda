@@ -686,7 +686,7 @@ endmodule
 <details>
 <summary> Описание на System Verilog </summary>
 
-```systenverilog
+```systemverilog
 module start_end_sda (
 	input clk,
 	input scl,
@@ -738,7 +738,7 @@ endmodule
 
 </details>
 
-**Модуль 5. Detect_pos_neg_scl.**
+**Модуль 5. ```detect_pos_neg_scl```.**
 
 Данный модуль использовался мной для перехода от передачи данных при
 ```SCL = 0``` к начальному/конечному состояниям, когда ```SDA``` меняется
@@ -749,9 +749,50 @@ endmodule
 В качестве потенциального улучшение может быть описывание данной схемы
 как FSM и разделения ```enable``` и ```rst```.
 
-![](media/image26.png)
 
-**Концептуальная схема I2C Slave, получение данных от Master**
+<details>
+<summary>Описание на System Verilog</summary>
+
+```systemverilog
+module detect_pos_neg_scl (
+	input clk,
+	input scl,
+	input enable,
+	input rst,
+	output detect_pos_scl,
+	output detect_neg_scl
+);
+
+logic detect_0_scl;
+
+logic detect_1_scl;
+
+always @(posedge clk) begin
+	if (rst || ~enable ) begin
+		detect_0_scl <= 1'd0;
+		detect_1_scl <= 1'd0;
+		
+		detect_pos_scl <= 1'd0;
+		detect_neg_scl <= 1'd0;
+	end
+	
+	else begin
+		if (~scl) detect_0_scl <= 1'd1;
+		if (scl && detect_0_scl) detect_pos_scl <= 1'd1;
+		
+		if (scl) detect_1_scl <= 1'd1;
+		if (~scl && detect_1_scl) detect_neg_scl <= 1'd1;
+		
+		
+	end
+end
+
+endmodule
+```
+
+</details>
+
+### Концептуальная схема I2C Slave, получение данных от Master
 
 ![](media/image27.png)
 
@@ -780,25 +821,119 @@ Master как быстрая проверка, режим передачи да�
 
 **Описание детектора ```Start/End``` на System Verilog**
 
-![](media/image31.png)
+<details>
+<summary>Описание на System Verilog</summary>
 
-**Детектор START/END на схеме**
+```systemverilog
+module detect_start_end (
+	input  rst,
+	input  sda,
+	input  clk,
+	input  scl,
+	
+	input  enable,
+	
+	output detected_start,
+	output detected_end
+	
+);
+
+logic detect_pos_sda;
+logic detect_neg_sda;
+
+
+always_ff @(posedge clk) begin
+	if (rst) begin 
+		detected_start <= 1'd0;
+		detected_end   <= 1'd0;
+	end
+	
+	else begin
+		if (enable) begin
+			if (detected_end && scl)   detected_end   <= detected_end;
+			else                       detected_end   <= detect_pos_sda && scl;
+			
+			if (detected_start && scl) detected_start <= detected_start;	
+			else                       detected_start <= detect_neg_sda && scl;
+			
+		end
+		
+		else begin 
+			detected_start <= 1'd0;
+			detected_end   <= 1'd0;
+		end
+	end
+end
+
+
+detect_pos_neg_signal detector_sda (
+	.clk(clk),
+	.signal(sda),
+	.enable(enable),
+	.rst(rst),
+	.detected_pos(detect_pos_sda),
+	.detected_neg(detect_neg_sda)
+);
+
+
+endmodule
+
+```
+</details>
+
+**Детектор ```START/END``` на схеме**
 
 ![](media/image32.png)
 
-**Дополнительный модуль 2. Детектор posedge/negedge сигнала.**
+**Дополнительный модуль 2. ```detect_pos_neg_signal```.**
 
 Введен был данный модуль для удобства описания детектора ```START/END```,
 можно было бы обойтись без него, описав его внутри дополнительного
 модуля 1.
 
-**Детектор posedge/negedge внутри START/END**
+**Детектор ```posedge/negedge``` внутри START/END**
 
 ![](media/image33.png)
 
-**Описание posedge/negedge detector of signal на System Verilog**
 
-![](media/image34.png)
+<details>
+<summary>Описание на System Verilog</summary>
+
+```systemverilog
+module detect_pos_neg_signal(
+	input signal,
+	input clk,
+	input rst,
+	input enable,
+	output detected_pos,
+	output detected_neg
+);
+
+localparam DETECTED_0_STATE = 1'd0,
+			  DETECTED_1_STATE = 1'd1;
+			  
+logic state;
+logic next_state;
+
+always_comb begin
+	next_state = state;
+	case(state)
+		DETECTED_0_STATE : if (signal) next_state  = DETECTED_1_STATE;
+		DETECTED_1_STATE : if (~signal) next_state = DETECTED_0_STATE;
+	endcase
+end
+
+assign detected_pos = ((state == DETECTED_0_STATE) && (next_state == DETECTED_1_STATE));
+assign detected_neg = ((state == DETECTED_1_STATE) && (next_state == DETECTED_0_STATE));
+
+
+always_ff @(posedge clk) begin
+	state <= next_state;
+end
+
+endmodule
+```
+</details>
 
 **Тестирование Master-Slave I2C.**
 
