@@ -799,7 +799,7 @@ Master как быстрая проверка, режим передачи да�
 пока что не реализован.
 
 <details>
-<summary>Описание I2C на System Verilog</summary>
+<summary>Описание I2C-slave на System Verilog</summary>
 
 ```systemverilog
 module my_i2c_r 
@@ -1069,8 +1069,6 @@ endmodule
 
 ![](media/image30.png)
 
-**Описание детектора ```Start/End``` на System Verilog**
-
 <details>
 <summary>Описание на System Verilog</summary>
 
@@ -1207,6 +1205,7 @@ endmodule
 ![](media/image37.png)
 
 ![](media/image38.png)
+
 **Передача номера ячейки памяти**
 
 ![](media/image39.png)
@@ -1235,7 +1234,7 @@ endmodule
 **1 Master и 2 Slave. Проверка передачи данных.**
 
 <details>
-<summary>Описание тестировочного содуля на System Verilog</summary>
+<summary>Описание тестировочного модуля на System Verilog</summary>
 
 ```systemverilog
 module from_master_to_slave_i2c (
