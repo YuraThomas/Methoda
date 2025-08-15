@@ -27,7 +27,7 @@ always @(posedge clk) begin
 	if (rst) begin
 		count_in_fifo <= '0;
 		count_out_fifo <= '0;
-		chislo = '0;
+		chislo <= '0;
 	end
 	else begin
 		if (push && ~pop) begin 
@@ -61,3 +61,4 @@ assign read_data = fifo [count_out_fifo];
 assign empty = (chislo == '0);
 assign full = (chislo == (depth));
 endmodule
+
