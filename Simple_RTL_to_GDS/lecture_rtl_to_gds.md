@@ -1124,7 +1124,7 @@ endmodule
 
 ## ```Cadence Innovus```
 
-**Кольцо питания, Stripes и via**
+**Кольцо питания, Stripes и special routing**
 
 ![](media/image15.png)
 
