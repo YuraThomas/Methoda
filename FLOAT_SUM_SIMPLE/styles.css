@@ -1,0 +1,129 @@
+/* Основной текст — Times New Roman, 12pt */
+body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    margin: 40px auto;
+    max-width: 900px;
+    padding: 0 20px;
+    color: #000000;
+    background-color: #ffffff;
+}
+
+/* Заголовки */
+h1 {
+    font-size: 24pt;
+    font-weight: bold;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #cccccc;
+    padding-bottom: 6px;
+}
+
+h2 {
+    font-size: 18pt;
+    font-weight: bold;
+    margin-top: 24px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 14pt;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+/* Параграфы */
+p {
+    margin-bottom: 8px;
+    text-align: justify;
+}
+
+/* === БЛОКИ КОДА С ПОДСВЕТКОЙ SYSTEMVERILOG === */
+
+/* Обёртка блока кода */
+pre {
+    background-color: #1e1e1e;  /* Тёмный фон как в редакторе */
+    border: 1px solid #444444;
+    border-radius: 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    margin: 12px 0 16px 0;
+    font-size: 11pt;
+    font-family: 'Consolas', 'Courier New', monospace;
+}
+
+/* Текст внутри блока кода */
+pre code {
+    color: #d4d4d4;  /* Базовый цвет текста */
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11pt;
+    display: block;
+    line-height: 1.5;
+}
+
+/* === ПОДСВЕТКА СИНТАКСИСА ДЛЯ SYSTEMVERILOG === */
+
+/* Комментарии */
+pre code .hljs-comment,
+pre code .hljs-comment * {
+    color: #6a9955;
+    font-style: italic;
+}
+
+/* Ключевые слова SystemVerilog (module, always, if, else, case, end, ...) */
+pre code .hljs-keyword {
+    color: #569cd6;
+    font-weight: bold;
+}
+
+/* Типы данных (logic, reg, wire, int, bit, ...) */
+pre code .hljs-type {
+    color: #4ec9b0;
+}
+
+/* Числа (42, 16'hA5, 3'b101) */
+pre code .hljs-number {
+    color: #b5cea8;
+}
+
+/* Строки */
+pre code .hljs-string {
+    color: #ce9178;
+}
+
+/* Имена модулей, экземпляров */
+pre code .hljs-title {
+    color: #dcdcaa;
+}
+
+/* Переменные и сигналы */
+pre code .hljs-variable {
+    color: #9cdcfe;
+}
+
+/* Операторы (+, -, *, /, =, <=, ...) */
+pre code .hljs-operator {
+    color: #d4d4d4;
+}
+
+/* Макросы (`ifdef, `define) */
+pre code .hljs-meta {
+    color: #c586c0;
+}
+
+/* Квадратные скобки, фигурные скобки, запятые */
+pre code .hljs-punctuation {
+    color: #d4d4d4;
+}
+
+/* Встроенный код (внутри строки) */
+:not(pre) > code {
+    background-color: #f0f0f0;
+    color: #c7254e;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11pt;
+}
