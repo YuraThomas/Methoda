@@ -49,9 +49,9 @@ logic [7:0] exp_diff;
 always_comb begin
 	exp_diff = exp_mx - exp_mn;
 	case ({denorm_mx, denorm_mn})
-	2'd00 : exp_diff = exp_mx - exp_mn;
-	2'd11 : exp_diff = 8'd0;
-	2'd01 : exp_diff = exp_mx - 1;
+	2'b00 : exp_diff = exp_mx - exp_mn;
+	2'b11 : exp_diff = 8'd0;
+	2'b01 : exp_diff = exp_mx - 1;
 	endcase
 end
 
