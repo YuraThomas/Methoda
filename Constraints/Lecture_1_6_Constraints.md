@@ -169,7 +169,7 @@ set_output_delay -clock my_clk 3 [all_outputs]
 
 ```tcl
 #Объявление my_clk_dev = my_clk/3, подключенного к портам цифрового блока с именем clk_dev
-create_generated_clock -name my_clk_dev -source CLKM -divide_by 3 [get_ports clk_dev]
+create_generated_clock -name my_clk_dev -source my_clk -divide_by 3 [get_ports clk_dev]
 ```
 
 <div class="page"/>
