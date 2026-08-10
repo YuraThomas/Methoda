@@ -1,10 +1,3 @@
----
-header-includes:
-  - \usepackage{amsmath}
-  - \usepackage{amssymb}
-  - \usepackage{mathtools}
----
-
 # Статический временной анализ. Constraints.
 
 ### Введение
