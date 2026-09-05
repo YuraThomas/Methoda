@@ -1,0 +1,20 @@
+body {
+    font-size: 14pt; /* или любой другой размер */
+    text-align: justify;
+}
+
+th, td {
+    font-size: 14pt;
+}
+
+h1 {
+    font-size: 24pt;
+}
+
+h2 {
+    font-size: 20pt;
+}
+
+h3 {
+    font-size: 17pt;
+}
